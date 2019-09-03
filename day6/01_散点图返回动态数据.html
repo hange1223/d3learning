@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="../js/d3.min.js" charset="UTF-8"></script>
+		<script src="../js/jquery-1.11.3.js"></script>
+		<style>
+			* {
+				padding: 0px;
+				margin: 0px;
+			}
+			.tooltip{
+				position:absolute;
+				width:100px;
+				height:auto;
+				color:white;
+				background-color: rgba(0, 0, 0, .4);
+				padding:10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="position:absolute;width:100%;height: 100%;">
+			<div id="mychart" style="float:left;width:100%;height: 100%;">
+			
+			</div>
+		</div>
+	</body>
+	
+	
+	<script>
+
+			var dataset;
+			//[ ['白酒','饼干','炒货'...],[175,249,261..],[1477,2258,2329...] ]
+			/*d3.json("scatter.json",function(error,data){
+				dataset=data.dataset;
+				console.log(dataset);
+				var dataset_new = d3.transpose(dataset);
+
+				var dlabel = dataset_new[0];
+				var xdata = dataset_new[1];
+				var ydata = dataset_new[2];
+				drawscatter("mychart",ydata,xdata,dlabel);
+			});*/
+			d3.xml("scatter.xml",function(error,data){
+				var dlabel = [];
+				var xdata = [];
+				var ydata = [];
+				$(data).find("row").each(function(){
+					dlabel.push($(this).children("name").text());
+					xdata.push($(this).children("quantity").text()-0);
+					ydata.push($(this).children("price").text()-0);
+				});
+				drawscatter("mychart",ydata,xdata,dlabel);
+			});
+			/*d3.text("scatter.txt",function(error,data){
+
+			});
+			var _csv=d3.dsv("csv文件名","text/csv;chartset=gb2312");
+			_csv("csv文件名",function(error,data){
+
+			});
+			d3.csv("scatter.csv",function(d){
+				return {
+					name: d.name,
+					quntity: +d.quntity,
+					reve: +d.re
+				}
+			});//转换格式
+d3.csv("scatter.csv",function(error,data){
+	var dlabel = [];
+	var xdata = [];
+	var ydata = [];
+	d3.map(data)
+			.each(function(d){
+				dlabel.push(d.name);
+				xdata.push(d.quantity);
+				ydata.push(d.revene);
+			})
+});*/
+			function drawscatter(divname,ydata,xdata,dlabel){
+				
+				var _swidth = $("#"+divname).width();
+				var _sheight = $("#"+divname).height();
+				var _margin = {top:10,left:30,right:10,bottom:30};
+				var _titleHeight = 50;
+				//得到绘图区的高度和宽度
+				var _chartHeight = _sheight - _margin.top - _margin.bottom - _titleHeight;
+				var _chartWidth = _swidth - _margin.left - _margin.right;
+				
+				//核心绘图区的边距
+				var _chartmargin  =  {top:20,left:20,right:20,bottom:20};
+				
+				//核心绘图区的高度和宽度
+				var _yaxisHeight = _chartHeight - _chartmargin.top - _chartmargin.bottom;
+				var _xaxisWidth = _chartWidth - _chartmargin.left - _chartmargin.right;
+				
+				var _padding = 0.5;
+				
+				var _svg = d3.select("#"+divname)
+						.append("svg")
+						.attr("width",_swidth)
+						.attr("height",_sheight);
+
+				var _tooltipdiv=d3.select("#"+divname)
+						.append("div")
+						.attr("class","tooltip");
+				var _glevel1 = _svg.append("g")
+									.attr("transform","translate("+_margin.left +","+_margin.top+")");
+				
+				var _glevel2_title = _glevel1.append("g");
+				
+				var _glevel2_chart = _glevel1.append("g")
+										.attr("transform","translate(0,"+_titleHeight+")");
+				
+				var _gleve3_yaxis = _glevel2_chart.append("g")
+								.attr("id","gyaxis")
+								.attr("transform","translate("+_chartmargin.left+","+_chartmargin.top+")");
+				
+				
+				var _gleve3_xaxis = _glevel2_chart.append("g")
+								.attr("id","gxaxis")
+								.attr("transform","translate("+_chartmargin.left+","+(_chartHeight - _chartmargin.bottom)+")");
+			
+				var _gleve3_content = _glevel2_chart.append("g")
+								.attr("id","chartcontent")
+								.attr("transform","translate("+_chartmargin.left+","+_chartmargin.top+")");
+				
+				
+				//定义Y轴比例尺
+				var _yscale = d3.scaleLinear()
+								   .domain( [0 , d3.max(ydata) ] ).nice()
+								   .range([_yaxisHeight,0])
+								   .clamp(true) ;
+				//定义Y轴坐标轴，使用前面定义的比例尺
+				var _yaxis = d3.axisLeft()
+								.scale(_yscale)
+								.ticks(5);
+				
+				_yaxis(_gleve3_yaxis);			
+				
+				//定义X轴比例尺
+				var _xscale = d3.scaleLinear()
+							   .domain([0,d3.max(xdata)])
+							   .range([0,_xaxisWidth]);
+				//定义X轴坐标轴
+				var _xaxis = d3.axisBottom()
+								.scale(_xscale);
+				
+				_xaxis(_gleve3_xaxis);
+				var _colorscale = d3.scaleQuantize()
+						.domain([1000,3000])
+						.range(['red','yellow','orange','green']);
+
+				var _drag = d3.drag()
+						.on("start",function(){
+							console.log("开始");
+						})
+						.on("drag",function(){
+							var x =d3.event.x,y=d3.event.y;
+							d3.select(this)
+									.attr("cx",x)
+									.attr("cy",y);
+						})
+						.on("end",function(){
+							var x =d3.event.x,y=d3.event.y;
+							if(x<=0||x>=_xaxisWidth||y<=0||y>=_yaxisHeight){
+								d3.select(this).remove();
+							}
+						});
+				_gleve3_content.append("g")
+					 	.selectAll("circle")
+						.data(dlabel)
+						.enter()
+						.append("circle")
+						.attr("cx",0)
+						.attr("cy",_yaxisHeight)
+						.attr("r","0")
+						.style("fill",function(d,i){
+							return _colorscale(ydata[i]);
+						})
+						.on("mouseover",function(d,i){
+							var r=d3.select(this).attr("r");
+							d3.select(this)
+									.transition()
+									.attr("r",r*1.5);
+							var xyposition=d3.mouse(this);
+							var _tooltipx=d3.event.pageX;
+							var _tooltipy=d3.event.pageY;
+							if((_xaxisWidth-xyposition[0])<130)
+								_tooltipx=_tooltipx-130;
+							if((_yaxisHeight-xyposition[1])<100)
+								_tooltipy=_tooltipy-100;
+							_tooltipdiv.style("top",_tooltipy+"px")
+									.style("left",_tooltipx+10+"px")
+									.style("display","block")
+									.html(d+"<br/>销售价格："+xdata[i]+"<br/>销售收入："+ydata[i]);
+						})
+						.on("mouseout",function(d,i){
+							_tooltipdiv.style("display","none");
+							d3.select(this)
+									.attr("r","10");
+						})
+						.call(_drag)
+						.transition()
+						.duration(5000)
+						.ease(d3.easeBounce)
+						.attr("cx",function(d,i){
+							return   _xscale(xdata[i]);
+						})
+						.attr("cy",function(d,i){
+							return _yscale(ydata[i]) ;
+						})
+						.attr("r","10");
+//				
+				_gleve3_content.append("g")
+						.selectAll("text")
+						.data(dlabel)
+						.enter()
+						.append("text")
+						.attr("x",0)
+						.attr("y",_yaxisHeight)
+						.attr("dx",'10')
+						.attr("dy","0.5em")
+						.style("fill",function(d,i){
+							return _colorscale(ydata[i]);
+						})
+						.transition()
+						.duration(5000)
+						.ease(d3.easeBounce)
+						.attr("x",function(d,i){
+							return _xscale(xdata[i]);
+						})
+						.attr("y",function(d,i){
+							return _yscale(ydata[i]);
+						})
+						.filter(function(d,i){
+							return ydata[i]>2500;
+						})
+						.text(function(d,i){
+							return d;
+						});
+						
+						
+				drawYaxisGrid("gyaxis",_xaxisWidth,"#ff1");
+				drawXaxisGrid("gxaxis",_yaxisHeight,"#ff1");
+			}
+			
+			
+			//给Y轴添加分割线
+			function drawYaxisGrid(divname,xwidth,color){
+				d3.select("#"+divname)
+					.selectAll("g")
+					.append("line")
+					.attr("x1",0)
+					.attr("y1",0)
+					.attr("x2",xwidth)
+					.attr("y2",0)
+					.attr("stroke",color)
+					.attr("stroke-width","0.5");
+			}
+			
+			//给X轴添加分割线
+			function drawXaxisGrid(divname,yheight,color){
+				d3.select("#"+divname)
+					.selectAll("g")
+					.append("line")
+					.attr("x1",0)
+					.attr("y1",0)
+					.attr("x2",0)
+					.attr("y2",-1*yheight)
+					.attr("stroke",color)
+					.attr("stroke-width","0.5");
+			}
+
+//			
+//			
+//			var _gAll = _svg.append("g")
+//							.attr("transform","translate(25,25)");
+//			
+//			var _gyaxis = _gAll.append("g")
+//								.attr("id","gyaxis")
+//								.attr("transform","translate(50,50)")
+//			
+//			var _linescale = d3.scaleLinear()
+//							   .domain([0,100]).nice()
+//							   .range([150,0])
+//							   .clamp(true) ;
+//			
+//			var _yaxis = d3.axisLeft()
+//							.scale(_linescale)
+//							//.ticks(2);
+//							.tickValues([0,25,50,75,100]);
+//			
+//			_yaxis(_gyaxis);
+//			
+//			d3.select("#gyaxis")
+//			   .selectAll("text")
+//			   .style("fill","blue");
+//			
+//			d3.select("#gyaxis")
+//				.selectAll("line")
+//				.style("stroke","blue");
+//				
+//			d3.select("#gyaxis")
+//				.selectAll("path")
+//				.style("stroke","blue");
+//				
+//				
+//			var _gxaxis = _gAll.append("g")
+//								.attr("id","gxaxis")
+//								.attr("transform","translate(50,200)");
+//			
+//			var _bandscale = d3.scaleBand()
+//							   .paddingInner(0.2)
+//							   .domain(['0~50','50~100','100~200','200~500','500~1000','1000~2000','>2000'])
+//							   .range([0,450]);
+//			
+//			var _xaxis = d3.axisBottom()
+//							.scale(_bandscale);
+//			
+//			_xaxis(_gxaxis);
+//			
+//			d3.select("#gxaxis")
+//			.selectAll("text")
+//			.style("fill","blue");
+//			
+//			d3.select("#gxaxis")
+//			.selectAll("line")
+//			.style("stroke","blue");
+//			
+//			d3.select("#gxaxis")
+//			.selectAll("path")
+//			.style("stroke","blue");
+//			
+//			
+//			var _gchartarea  = _gAll.append("g")
+//									.attr("transform","translate(50,50)");
+//			
+//			_gchartarea.append("g")
+//					 	.selectAll("rect")
+//						.data(dataset)
+//						.enter()
+//						.append("rect")
+//						.attr("x",function(d,i){
+//							return _bandscale(xlabel[i]);
+//						})
+//						.attr("y",function(d,i){
+//							return 150 - _linescale(100-d);
+//						})
+//						.attr("width",_bandscale.bandwidth())
+//						.attr("height",function(d,i){
+//							return _linescale(100-d);
+//						})
+//						.style("fill","steelblue");
+//			
+//			
+//			_gchartarea.append("g")
+//						.selectAll("text")
+//						.data(dataset)
+//						.enter()
+//						.append("text")
+//						.attr("x",function(d,i){
+//							return _bandscale(xlabel[i]);
+//						})
+//						.attr("y",function(d,i){
+//							return 150 - _linescale(100-d);
+//						})
+//						.attr("dx",_bandscale.bandwidth()/2)
+//						.attr("dy","1em")
+//						.attr("text-anchor","middle")
+//						.text(function(d){
+//							return d;
+//						})
+//						.style("fill","#fff");
+//			
+//			
+//			//添加Y轴方向的分割线，即背景的网格线
+//			d3.select("#gyaxis")
+//				.selectAll("g")
+//				.append("line")
+//				.attr("x1",0)
+//				.attr("y1",0)
+//				.attr("x2",450)
+//				.attr("y2",0)
+//				.attr("stroke","grey")
+//				.attr("stroke-width","0.5");
+				
+				
+		</script>
+</html>

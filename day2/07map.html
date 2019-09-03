@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var dataset=[50,100,20,30,60];
+    var dataobj=[{name:'商品1',value:50},{name:'商品2',value:20},{name:'商品3',value:30}];
+   // console.log(dataobj);
+    var dataset_map = d3.map(dataset);
+   /* console.log(dataset_map);
+    console.log(dataset_map.keys());
+    console.log(dataset_map.values());
+    console.log(dataset_map.entries());
+    console.log(dataset_map.get("4"));
+    console.log(dataset_map.get("6"));//不存在undefined
+    dataset_map.set("5",40);
+    console.log(dataset_map.entries());*/
+    var dataobj_map = d3.map(dataobj,function(d){
+        return d.name;
+    });
+    //console.log(dataobj_map);
+    console.log(dataobj_map.keys());
+    console.log(dataobj_map.values());
+    console.log(dataobj_map.entries());
+    console.log(dataobj_map.get("商品1").value);
+    dataobj_map.set("商品4",{name:'商品4',value:80});
+    console.log(dataobj_map);
+    dataobj_map.each(function(d){
+        if(d.value<30){
+            d.rate=1.15;
+        }else{
+            d.rate=1.17;
+        }
+    });
+    dataobj_map.each(function(d){
+        if(d.value<30){
+            d.num=115;
+        }else{
+            d.num=117;
+        }
+    });
+    dataobj_map.remove("商品1");
+    console.log(dataobj_map);
+</script>
+</body>
+</html>

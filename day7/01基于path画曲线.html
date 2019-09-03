@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+</head>
+<body>
+<script>
+    var _svg=d3.select("body")
+            .append("svg")
+            .attr("width","400")
+            .attr("height","300");
+    var _linepath1=d3.path();
+    _linepath1.moveTo(20,20);
+    _linepath1.lineTo(300,40);
+    _svg.append("path")
+            .attr("d",_linepath1.toString())
+            .style("stroke","red");
+    console.log(_linepath1.toString());
+    var _linepath2=d3.path();
+    _linepath2.moveTo(20,60);
+    //二次贝塞尔曲线
+    _linepath2.quadraticCurveTo(200,65,300,180);
+    console.log(_linepath2.toString());
+    _svg.append("path")
+            .attr("d",_linepath2.toString())
+            .style("stroke","green")
+            .style("fill","none");
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+    <style>
+        .tooltip{
+            position:absolute;
+            width:100px;
+            height:auto;
+            color:white;
+            background-color: rgba(0, 0, 0, .4);
+            padding:10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var dataset=[
+        {name:'商品1',value:50},
+        {name:'商品2',value:20},
+        {name:'商品3',value:30},
+        {name:'商品4',value:10}
+    ];
+
+    var _pie=d3.pie()
+            //如果不指定sort默认降序排，指定null无序排
+            .sort(null)
+        //让每块间有空隙注意角度不是具体数字，而是用Math.PI换算
+            .padAngle(Math.PI*0.01)
+            .value(function(d){
+                return d.value;
+            });//饼图生成器
+    var _arcdata=_pie(dataset);//使用饼图生成器生成相应路径数据
+    var _arc=d3.arc()//弧状生成器可以直接用上面的数据生成饼图
+            .innerRadius(60)
+            .outerRadius(100);
+
+    var _tooltipdiv=d3.select("body")
+            .append("div")
+            .attr("class","tooltip");
+    var totalduration=0;
+   var enter = d3.select("body")
+            .append("svg")
+            .attr("width",300)
+            .attr("height",300)
+            .selectAll("path")
+            .data(_arcdata)
+            .enter()
+           .each(function(d,i){
+               d.duration =(d.endAngle- d.startAngle)/(2*Math.PI)*10;
+               d.delay=totalduration;
+               totalduration=totalduration+d.duration;
+           })
+           .append("path")
+           .attr("transform","translate(150,150)")
+           .style("fill",function(d,i){
+               return d3.schemeCategory20[i];
+           })
+           .transition()
+           .duration(function(d){
+               return d.duration*1000;
+           })
+           .delay(function(d){
+               return d.delay*1000;
+           })
+           .tween("path",function(d,i){
+               var node=this;
+               var initEndAngle = d.endAngle;
+               return function(t){
+                   d.endAngle=d.startAngle+(t*initEndAngle-t*d.startAngle);
+                   d3.select(node)
+                           .attr("d",_arc(d));
+               }
+           });
+    /*d3.select("body")
+            .append("svg")
+            .attr("width",300)
+            .attr("height",300)
+            .selectAll("path")
+            .data(_arcdata)
+            .enter()
+            .append("path")
+            /!*.attr("d",function(d,i){
+               return _arc(d);
+            })*!/
+            .attr("d",_arc)
+            .attr("transform","translate(150,150)")
+            .style("fill",function(d,i){
+                return d3.schemeCategory20[i];
+            })
+            /!*.on("mouseover",function(){
+                d3.select(this)
+                  .attr("transform","translate(150,150) scale(1.2)")
+            })
+            .on("mouseout",function(){
+                d3.select(this)
+                        .attr("transform","translate(150,150) scale(1)")
+            })*!/
+            .on("mouseover",function(d){
+                _arc.innerRadius(100)
+                        .outerRadius(130);
+                d3.select(this)
+                        .transition()
+                        .duration(1000)
+                        .attr("d",_arc(d));
+            })
+                    .on("mouseout",function(d){
+                        _arc.innerRadius(60)
+                                .outerRadius(100);
+                d3.select(this)
+                        .transition()
+                        .duration(1000)
+                        .attr("d",_arc(d));
+                    });*/
+    d3.select("body")
+            .select("svg")
+            .selectAll("text")
+            .data(_arcdata)
+            .enter()
+            .append("text")
+            .attr("x",function(d,i){
+              return  _arc.centroid(d)[0];
+            })
+            .attr("y",function(d,i){
+                return  _arc.centroid(d)[1];
+            })
+            .text(function(d){
+                return d.value;
+            })
+            .attr("text-anchor","middle")
+            .attr("transform","translate(150,150)")
+            .style("fill","white");
+</script>
+</body>
+</html>

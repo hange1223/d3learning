@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+    <script>
+        var dataset=[
+            {name:'城市1',points:[115.6640625, 26.588527147308614],value:5000},
+            {name:'城市2',points:[106.34765625, 30.524413269923986],value:2500},
+            {name:'城市3',points:[ 114.169921875, 34.379712580462204],value:5500},
+            {name:'城市4',points:[ 112.939453125, 30.826780904779774],value:8000}
+        ];
+        var datamap=d3.map(dataset,function(d){return d.name;});
+        var links=[
+            {source:'城市1',target:'城市4',value:30},
+            {source:'城市2',target:'城市4',value:50},
+            {source:'城市3',target:'城市4',value:20}
+        ];
+        var geojson = [
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        115.6640625,
+                        26.588527147308614
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        106.34765625,
+                        30.524413269923986
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        114.169921875,
+                        34.379712580462204
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        112.939453125,
+                        30.826780904779774
+                    ]
+                }
+            }
+        ];
+        var maxdata=d3.max(dataset,function(d){
+            return d.value;
+        });
+        var rsize=d3.scaleQuantize().domain([0,maxdata]).range([5,8,14,16]);
+
+        //1 获取json数据
+       d3.json("china.json",function(error,data){
+           //2定义投影
+           var _projection=d3.geoMercator()
+                   .center([107,31])
+                  .fitExtent([[0,0],[800,600]],data);
+                  /* .translate([400,300])
+                   .scale(500);*/
+           //3 定义地图路径生成器
+           var _geopath=d3.geoPath()
+                   .projection(_projection);
+           //4 基于获取的数据可视化
+           var _svg=d3.select("body")
+                   .append("svg")
+                   .attr("width",800)
+                   .attr("height",600);
+           var _def=_svg.append("defs")
+                   .append("marker")
+                   .append("id","arrow")
+                   .attr("markerWidth",13)
+                   .attr("markerHeight",13)
+                   .attr("refx",2)
+                   .attr("refy",6)
+                   .attr("orient","auto")
+                   .append("path")
+                   .attr("d","M2,2 L2,11 L10,6 L2,2")
+                   .style("fill","red");
+           _svg.selectAll(".mappath")
+                   .data(data.features)
+                   .enter()
+                   .append("path")
+                   .attr("d",_geopath)
+                   .style("fill","grey");
+           _svg.selectAll(".pointpath")
+                   .data(geojson)
+                   .enter()
+                   .append("path")
+                   .attr("class","pointpath")
+                   .attr("d",_geopath.pointRadius(10))
+                   .style("fill","red");
+           _svg.selectAll("circle")
+                   .data(dataset)
+                   .enter()
+                   .append("circle")
+                   .attr("cx",function(d){
+                       var point= d.points;
+                       var xypoint=_projection(point);
+                       return xypoint[0];
+                   })
+                   .attr("cy",function(d){
+                       var point= d.points;
+                       var xypoint=_projection(point);
+                       return xypoint[1];
+                   })
+                   .attr("r",function(d){
+                       console.log(d);
+                       return rsize(d.value);
+                   })
+                   .style("fill","green");
+           _svg.selectAll(".links")
+                   .data(links)
+                   .enter()
+                   .append("path")
+                   .attr("class","links")
+                   .attr("d",function(d){
+                       var _sourcename= d.source;
+                       var _sourcepoint=datamap.get(_sourcename).points;
+                       var _sourcexy=_projection(_sourcepoint);
+                       var _targetname= d.target;
+                       var _targetpoint=datamap.get(_targetname).points;
+                       var _targetxy=_projection(_targetpoint);
+                       var _linepath=d3.path();
+                       _linepath.moveTo(_sourcexy[0],_sourcexy[1]);
+                       _linepath.lineTo(_targetxy[0],_targetxy[1]);
+                       return  _linepath.toString();
+                   })
+                   .style("stroke","red");
+       });
+    </script>
+</body>
+</html>

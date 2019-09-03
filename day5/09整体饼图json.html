@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+    <style>
+        .tooltip{
+            position:absolute;
+            width:100px;
+            height:auto;
+            color:white;
+            background-color: rgba(0, 0, 0, .4);
+            padding:10px;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var dataset=[
+        {name:'商品1',value:50},
+        {name:'商品2',value:20},
+        {name:'商品3',value:30},
+        {name:'商品4',value:10}
+    ];
+
+    var _pie=d3.pie()
+            //如果不指定sort默认降序排，指定null无序排
+            .sort(function(a,b){
+                //return a.value- b.value;
+                return d3.ascending(a.value, b.value);
+            })
+        //让每块间有空隙注意角度不是具体数字，而是用Math.PI换算
+            .padAngle(Math.PI*0.01)
+            .value(function(d){
+                return d.value;
+            });//饼图生成器
+    var _arcdata=_pie(dataset);//使用饼图生成器生成相应路径数据
+    var _arc=d3.arc()//弧状生成器可以直接用上面的数据生成饼图
+            .innerRadius(60)
+            .outerRadius(100);
+
+    var _tooltipdiv=d3.select("body")
+            .append("div")
+            .attr("class","tooltip");
+
+    d3.select("body")
+            .append("svg")
+            .attr("width",300)
+            .attr("height",300)
+            .selectAll("path")
+            .data(_arcdata)
+            .enter()
+            .append("path")
+            .attr("d",function(d,i){
+                var _path=_arc(d);
+                console.log(_arc.centroid(d));
+               return  _path;
+            })
+            //.attr("d",_arc)
+            .attr("transform","translate(150,150)")
+            .style("fill",function(d,i){
+                return d3.schemeCategory20[i];
+            })
+            .on("mouseover",function(d,i){
+                var _tooltipx=d3.event.x;
+                var _tooltipy=d3.event.y;
+                _tooltipdiv.style("top",_tooltipy+"px")
+                        .style("left",_tooltipx+10+"px")
+                        .style("display","block")
+                        .html(d.data.name+"<br/>销售收入："+ d.data.value);
+            })
+            .on("mousemove",function(d,i){
+                var _tooltipx=d3.event.x;
+                var _tooltipy=d3.event.y;
+                _tooltipdiv.style("top",_tooltipy+"px")
+                        .style("left",_tooltipx+10+"px");
+            })
+            .on("mouseout",function(d,i){
+                _tooltipdiv.style("display","none");
+            });
+    d3.select("body")
+            .select("svg")
+            .selectAll("text")
+            .data(_arcdata)
+            .enter()
+            .append("text")
+            .attr("x",function(d,i){
+              return  _arc.centroid(d)[0];
+            })
+            .attr("y",function(d,i){
+                return  _arc.centroid(d)[1];
+            })
+            .text(function(d){
+                return d.value;
+            })
+            .attr("text-anchor","middle")
+            .attr("transform","translate(150,150)")
+            .style("fill","white");
+</script>
+</body>
+</html>

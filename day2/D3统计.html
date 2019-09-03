@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+</head>
+<body>
+<script>
+    var dataset=[50,undefined,20,30,NaN];
+
+    var dataobj=[{name:'商品1',value:50},{name:'商品2',value:20},{name:'商品3',value:30}];
+
+
+    console.log( d3.sum(dataset,function(d){
+        if(d<30){
+            return d*1.15;
+        }  else {
+            return d*1.17;
+        }
+    }));
+    console.log(d3.sum(dataobj,function(d){
+        return d.value;
+    }));
+    console.log(d3.mean(dataset));
+    console.log(d3.max(dataset));
+    console.log(d3.extent(dataset));
+    console.log(d3.max(dataobj,function(d){
+        return d.value;
+    }));
+</script>
+</body>
+</html>

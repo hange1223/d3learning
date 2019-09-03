@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+    <style>
+        #d2{
+            background-color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div id="d1">
+        <p>1</p>
+        <p>2</p>
+        <p>3</p>
+    </div>
+    <!-- <div class="d2">
+        <p>1</p>
+        <p>2</p>
+        <p>3</p>
+    </div> -->
+
+</body>
+    <script>
+       var p = d3.select("p");//选中第一个
+        var p2=d3.selectAll("p");//选中所有的p标签
+       /*var p3 = d3.select("#d1").selectAll("p").text("Hello World")
+               .style("color","blue")
+               .append("p")
+               .text("new hello world");*///选中d1下的所有p标签
+//       var p4= d3.select(".d2").selectAll("p");
+       var p3 = d3.select("#d1")
+                  .selectAll("p")
+                //   .datum(function(){
+                //       return ['red', 'blue', 'yellow']
+                //   })
+                //   .text(function(d,i){
+                //         return d[i];
+                //   })
+                //   .style("color",function(d, i){
+                //       console.log('123',d)
+                //       return d[i]; 
+                //   })
+                  .sort(function(a,b){
+                      return -1;
+                  });
+                  d3.select('#d1').append('p').text(4);
+                  d3.selectAll('p').order();
+    //    var newp3=p3.append("p")
+    //                 .text("new hello world");
+    //    var p5= d3.select("#d1")
+    //            .insert("p")
+    //            .text("大家好");
+    //    var p6 = d3.select("#d1")
+    //            .append("p").text("你们好");
+    //    d3.select("#d1").style("border","1px solid red");
+    //    d3.select(".d2").attr("id","d2");
+    //    newp3.remove();
+    //    console.log(p6);
+    </script>
+</html>

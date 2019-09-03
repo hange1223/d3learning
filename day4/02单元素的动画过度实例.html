@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var compColor=d3.interpolateRgb(d3.rgb(0,209,47),d3.rgb(130,0,130));
+    var _svg = d3.select("body")
+            .append("svg")
+            .attr("width",600)
+            .attr("height",400);
+    var _rect=_svg.append("rect")
+            .attr("x",20)
+            .attr("y",20)
+            .attr("width",20)
+            .attr("height",20);
+    var _rect_transition =_rect.transition()
+            .duration(5000)
+            .delay(2000)
+            .ease(d3.easeBack)//会稍微回退一下
+            //.ease(d3.easeElastic)//弹跳式
+            //.ease(d3.easeBounce)//弹跳式还有bounceIn  bounceOut
+            //.ease(d3.easeLinear)//匀速
+            .attr("width",200)
+            .styleTween("fill",function(d){
+                return function(t){
+                    return compColor(t);
+                }
+            });//不能再绑定数据
+    var compNum=d3.interpolateNumber(0,200);
+    var _rect2=_svg.append("rect")
+            .attr("x",20)
+            .attr("y",60)
+            .attr("width",0)
+            .attr("height",20)
+            .transition()
+            .attrTween("width",function(d,i){
+                return function(t){
+                    return compNum(t);//t是(0,1]
+                }
+            })
+            .duration(2000)
+            .delay(1000);
+var _rect3=_svg.append("rect")
+        .attr("x",20)
+        .attr("y",100)
+        .attr("width",100)
+        .attr("height",100)
+        .transition()
+        .duration(5000)
+        .attr("x",120)
+        .attr("y",110)
+        .attr("width",60)
+        .attr("height",60)
+        .transition()
+        .duration(5000)
+        .attr("x",240)
+        .attr("y",140)
+        .attr("width",20)
+        .attr("height",20)
+       ;
+</script>
+</body>
+</html>

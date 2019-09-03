@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var dataset=[50,100,20,30,60];
+    var dataobj=[{name:'商品1',value:50},{name:'商品2',value:20},{name:'商品3',value:30}];
+    dataset.sort(function(a,b){
+        return d3.ascending(a,b);//此为升序，descending为降序
+    });
+    //console.log(dataset);
+    dataset.sort(d3.descending);//此为降序简写
+    //console.log(dataset);
+    dataobj.sort(function(a,b){
+        return d3.descending(a.value, b.value);
+    });
+    //console.log(dataobj);
+
+    var datasetnew=[50,100,20,30,60];
+    //console.log(d3.scan(datasetnew));//此为默认的，最小值的索引
+   /* console.log(d3.scan(datasetnew,function(a,b){
+        return b-a;
+    }));*///此为寻找最大值的索引
+    var dataobjnew=[{name:'商品1',value:50},{name:'商品2',value:20},{name:'商品3',value:30}];
+
+    console.log(d3.scan(dataobjnew,function(a,b){
+        return a.value- b.value;
+    }));//此为获取最小值的索引
+    console.log(d3.scan(dataobjnew,function(a,b){
+        return b.value- a.value;
+    }));//获取最大值的索引
+    //使用bisect
+    console.log(d3.bisectRight(datasetnew.sort(d3.asecending),60));
+    console.log(d3.bisectLeft(datasetnew.sort(d3.asecending),30));
+    var _index=d3.bisectRight(datasetnew.sort(d3.asecending),30);
+    datasetnew.splice(_index,0,40);
+    console.log(datasetnew);
+
+    dataobjnew.sort(function(a,b){
+        return d3.ascending(a.value, b.value);
+    });//此为排序
+    var _bisector=d3.bisector(function(d){return d.value;});////封装函数，按照value值排序
+
+    console.log(_bisector.right(dataobjnew,40));//打印索引
+    dataobjnew.splice(_bisector.right(dataobjnew,40),0,{name:'商品4',value:40});//插入
+    console.log(dataobjnew);
+</script>
+</body>
+</html>

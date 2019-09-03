@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+    <style>
+        circle{
+            fill:rgba(31,119,180,0.25);
+            stroke:rgb(31,119,180);
+            stroke-width:1px;
+        }
+        .leaf{
+            fill:orange;
+        }
+
+
+    </style>
+</head>
+<body>
+<script>
+    var dataset={
+        "name":"家用电器",
+        detail:[
+            {
+                name:"电视",
+                detail:[
+                    {name:"曲面电视",revenue:200},
+                    {name:"超薄电视",revenue:120},
+                    {name:"电视配件",revenue:80}
+                ]
+            },
+            {
+                name:"空调",
+                detail:[
+                    {
+                        name: "壁挂式空调",
+                        detail: [
+                            {name:'格力',revenue:100},
+                            {name:'海尔',revenue:80}
+                        ]
+                    },
+                    {name:"柜式空调",revenue:40}
+                ]
+            }
+        ]
+    };
+    //基于数据形成hierarchy数据
+    var _hierarchydata=d3.hierarchy(dataset,function(d){return d.detail;})//指定detail为children
+            .sum(function(d){return d.revenue;});
+
+    var _treecreater=d3.tree()
+            .size([600,600]);
+    var _treedata=_treecreater(_hierarchydata);
+   //基于层次数据实现可视化效果
+    var _allnodes=_treedata.descendants();
+    var _svg=d3.select("body")
+            .append("svg")
+            .attr("width",600)
+            .attr("height",700);
+    var _circles=_svg.append("g")
+            .attr("transform","translate(0,10)")
+            .selectAll("circle")
+            .data(_allnodes)
+            .enter()
+            .append("circle")
+            .attr("cx",function(d){
+                return d.x;
+            })
+            .attr("cy",function(d){
+                return d.y;
+            })
+            .attr("r",10)
+            .style("fill","steelblue");
+    var _alllinks=_treedata.links();
+    var _links=_svg.selectAll("line")
+            .data(_alllinks)
+            .enter()
+            .append("line")
+            .attr("x1",function(d){
+                return d.source.x;
+            })
+            .attr("y1",function(d){
+                return d.source.y;
+            })
+            .attr("x2",function(d){
+                return d.target.x;
+            })
+            .attr("y2",function(d){
+                return d.target.y;
+            })
+            .style("stroke","steelblue");
+    console.log(_alllinks);
+</script>
+</body>
+</html>

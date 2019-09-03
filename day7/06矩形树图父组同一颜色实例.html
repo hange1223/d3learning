@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var dataset={
+        "name":"家用电器",
+       detail:[
+            {
+                name:"电视",
+                detail:[
+                    {name:"曲面电视",revenue:200},
+                    {name:"超薄电视",revenue:120},
+                    {name:"电视配件",revenue:80}
+                ]
+            },
+            {
+                name:"空调",
+                detail:[
+                    {name:"壁挂式空调",revenue:80},
+                    {name:"柜式空调",revenue:40}
+                ]
+            }
+        ]
+    };
+    var _color=d3.scaleOrdinal()
+            .domain(['电视','空调'])
+            .range(['green','blue']);
+    //直接访问d3.hierarchy(dataset)得到的是根节点
+    var _hierarchydata=d3.hierarchy(dataset,function(d){return d.detail;})
+            .sum(function(d){
+                return d.revenue;
+            })
+            .eachBefore(function(node){
+                //给每个节点的数据添加新的属性，取得父节点的名称
+              return node.data.parentname=node.parent?node.parent.data.name:node.data.name;
+            });//个数
+
+    var _treemapGen=d3.treemap()
+            .paddingInner(2)
+            .tile(d3.treemapBinary)//设置生成方式
+            .size([700,600]);
+    //得到了treemap后得到的仍是hieradchy的层次数据
+    var _treedata=_treemapGen(_hierarchydata)
+            .leaves();
+    console.log(_treedata);
+    var _svg=d3.select("body")
+            .append("svg")
+            .attr("width","700")
+            .attr("height","600");
+           _svg.selectAll("rect")
+            .data(_treedata)
+            .enter()
+            .append("rect")
+            .attr("x",function(d){
+                return d.x0;
+            })
+            .attr("y",function(d){
+                return d.y0;
+            })
+            .attr("width",function(d){
+                return d.x1- d.x0;
+            })
+            .attr("height",function(d){
+                return d.y1- d.y0;
+            })
+            .style("fill",function(d,i){
+                       return _color(d.data.parentname);
+                   });
+    _svg.selectAll("text")
+            .data(_treedata)
+            .enter()
+            .append("text")
+            .attr("x",function(d){
+                return d.x0;
+            })
+            .attr("y",function(d){
+                return d.y0;
+            })
+            .attr("dy","1em")
+            .text(function(d){
+                return d.data.name;
+            })
+            .style("fill","white");
+</script>
+</body>
+</html>

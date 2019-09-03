@@ -1,0 +1,125 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    background-color:#eef2f5;
+    width:100%;
+    height:100%;
+}
+#Wrap{
+    width:100%;
+    height:100%;
+    position:absolute;
+    left:0;
+    top:0;
+    z-index: 3;
+}
+.header{
+    width:100%;
+    height:10%;
+    text-align: center;
+}
+.header h1{
+    font-size: 43;
+    font-weight: normal;
+    line-height: 100px;
+}
+.nav{
+    width:96%;
+    height:12.5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.nav div{
+    height:100%;
+    width:24%;
+    margin-right:1.33%;
+    background-color: #fff;
+    float: left;
+}
+.nav div:last-child{
+    float: right;
+    margin-right: 0;
+}
+.direc{
+    font-size: 18px;
+    margin-left: 10%;
+    margin-top: 5%;
+    font-weight: bolder;
+}
+.num{
+    font-size: 30px;
+    margin-left: 10%;
+    font-weight:200;
+}
+.tag{
+    font-size: 12px;
+    margin-left: 13%;
+    font-weight:200;
+    color:#8a8a8a;
+}
+.main{
+    height:71%;
+    width:96%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.main .line1{
+    width:100%;
+    height:53.5%;
+    margin-bottom:0.5%;
+}
+.main .bar,.main .tab{
+    width:49.3333%;
+    margin-right: 1.33%;
+    height:100%;
+    background-color: #ffffff;
+    float: left;
+}
+.main .scatter,.main .pie{
+    width:49.3333%;
+    height:100%;
+    background-color: #ffffff;
+    float: right;
+}
+.main .line2{
+    width:100%;
+    height:49.5%;
+}
+.main .tab h3{
+    margin-left: 10%;
+    line-height: 80px;
+}
+.main .tab table{
+    border:1px solid #e7e9eb;
+    border-collapse: collapse;
+    width:80%;
+    height:70%;
+    margin:0 auto;
+}
+.main .tab table th{
+    background-color: #eceff2;
+    height:40px;
+}
+.main .tab table tr td:first-child{
+    width:30%;
+    padding-left: 10px;
+}
+.main .tab table tr td:nth-child(2),.main .tab table tr td:nth-child(3),.main .tab table tr td:last-child{
+    text-align: right;
+    padding-right: 10px;
+}
+.main .tab table th,.main .tab table td{
+    border:1px solid #e7e9eb;
+}
+.tooltip{
+    position:absolute;
+    width:100px;
+    height:auto;
+    color:white;
+    background-color: rgba(0, 0, 0, .4);
+    padding:10px;
+    display: none;
+}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../css/style.css"/>
+
+</head>
+<style>
+    .tooltip {
+        position: absolute;
+        width: 130px;
+        height: auto;
+        font-family: "微软雅黑";
+        color: #FFFFFF;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 10px;
+        display: none;''
+    }
+</style>
+<script src="js/d3.js" charset="utf-8"></script>
+<script src="js/jquery-1.11.3.js" charset="utf-8"></script>
+<body>
+<div id="chart4" style="position:relative;width:100%;height: 100%;border: 1px solid #000;"></div>
+</body>
+<script>
+    /*---------------------------------饼图-----------------------------------------------*/
+    //可以实现可相应
+    /* $(window).ready(function () {
+     bie("chart4");
+     })
+
+     $(window).resize(function () {
+     $("#chart4").html("");
+     bie("chart4");
+     });*/
+
+    /*------------------数据部分----------------*/
+    var dataset =[
+        {name:'商品1',value:50},
+        {name:'商品2',value:20},
+        {name:'商品3',value:30},
+        {name:'商品4',value:10},
+        {name:'商品5',value:20}
+    ];
+
+    //添加提示盒子div
+    var _tooltipdiv=d3.select('body')
+            .append('div')
+            .attr('class','tooltip');
+    /*-----------------数据处理部分---------------------*/
+    //饼图生成器
+    var  _arcdata=d3.pie()//必须封装成对象
+                          //如果不指定sort，默认是降序排，如果将sort指定为null，那么就是没有排序，否则需要在sort中指定排序规则
+                          //.sort(null)
+            .sort(function(a,b){return d3.ascending(a.value,b.value);})
+        //让弧状结构之间有空隙，间隔。！！！注意角度不是具体写一个数字，而是要使用PI进行换算
+            .padAngle(Math.PI*0.01)
+            .value(function(d){return d.value});
+
+
+    /*---------------------------起始生成起始角和终止角---------------------------*/
+    var  _arcdatacrcle=_arcdata(dataset);//生成一组对象
+    //console.log(_arcdata);
+
+    /*---------------------------存储点击前的数组--------------------------------*/
+    var _rearcdata=dataset;
+    var arr=dataset;
+    var databefore=dataset;
+    var demo;
+
+    refbie(_rearcdata,_arcdatacrcle,databefore);
+
+    //图形函数部分
+    function refbie(_rearcdata,_arcdatacrcle,databefore) {
+       /* console.log(databefore);
+        console.log(_rearcdata);*/
+        d3.select('svg').remove();
+        /*-----------------数据处理部分---------------------*/
+        var  _arcdata1=d3.pie()//必须封装成对象
+                               //如果不指定sort，默认是降序排，如果将sort指定为null，那么就是没有排序，否则需要在sort中指定排序规则
+                               //.sort(null)
+                .sort(function(a,b){return d3.ascending(a.value,b.value);})
+            //让弧状结构之间有空隙，间隔。！！！注意角度不是具体写一个数字，而是要使用PI进行换算
+                .padAngle(Math.PI*0.01)
+                .value(function(d){return d.value});
+        var  _arcdata2=d3.pie()//必须封装成对象
+                               //如果不指定sort，默认是降序排，如果将sort指定为null，那么就是没有排序，否则需要在sort中指定排序规则
+                               //.sort(null)
+                .sort(function(a,b){return d3.ascending(a.value,b.value);})
+            //让弧状结构之间有空隙，间隔。！！！注意角度不是具体写一个数字，而是要使用PI进行换算
+                .padAngle(Math.PI*0.01)
+                .value(function(d){return d.value});
+
+        var  _arcdata=_arcdata2(_rearcdata);//生成一组对象
+        //console.log(_arcdata);
+
+        var databeforeobj=_arcdata1(databefore);
+        //console.log(databeforeobj);
+        var mapdatabeforeobj=d3.map(databeforeobj,function(d){ return d.data.name;});
+        //弧状生成器
+        var _arc=d3.arc()
+                .innerRadius(50)
+                .outerRadius(100);
+        //设置画布
+        var _svg=d3.select('body')
+                .append('svg')
+                .attr('width',400)
+                .attr('height',400)
+
+        //图例
+        _svg.selectAll('circle')
+                .data(_arcdatacrcle)
+                .enter()
+                .append('circle')
+                .attr('id', function (d,i) {
+                    //console.log(i)
+                    return d.index;
+                })
+                .attr('cx', function (d) {
+                    return '20';
+                })
+                .attr('cy', function (d,i) {
+                    return 14+i*30+'';
+                })
+                .style('fill', function (d,i) {
+                    return d3.schemeCategory10[i];
+                })
+                .attr('r',10)
+                .on('click', function (d){
+                    var databefore1=arr;
+
+                    if(d.data){
+
+                        d._data=d.data;
+                        d.data=null;
+                        for(var j=0;j<arr.length;j++){
+                            if(d._data==arr[j]){
+                                arr.splice(j,1);
+                            }
+                        }
+                    }
+                    else{
+                        //console.log(databefore)
+                        d.data=d._data;
+                        d._data=null;
+                        arr.push(d.data);
+                        //console.log(arr)
+                    }
+
+                    refbie(arr,_arcdatacrcle,databefore1);
+
+                });
+        //路径生成
+        var flag=0;
+        var _path=_svg.selectAll('.pathclass')
+                .data(_arcdata)
+                .enter()
+                .each(function (d,i) {
+
+                    var dataname=d.data.name;
+                    d.beforestartAngle=mapdatabeforeobj.get(dataname).startAngle;
+                    d.beforendAngle=mapdatabeforeobj.get(dataname).endAngle;
+                    /*d.duration=Math.abs(d.endAngle-d.beforestartAngle)/(Math.PI*2)*100;*/
+                    //console.log(d.duration)
+                })
+                .append('path')
+                .attr('id', function (d,i) {
+                    //console.log(i)
+                    return i;
+                })
+                .attr('transform','translate(200,150)')
+                .attr('fill', function (d,i) {
+                    return d3.schemeCategory10[i];
+                })
+            //添加提示框功能和放大功能
+                .on('mouseover', function (d,i) {
+                    var tooltipx=d3.event.pageX;
+                    var tooltipy=d3.event.pageY;
+                    //提示框跟着鼠标走
+                    _tooltipdiv.style('left',tooltipx+10+'px')
+                            .style('top',tooltipy+10+'px')
+                            .style('display','block')
+                            .html('商品：'+d.data.name+'');
+
+                })
+                .on('mousemove', function (d,i) {
+                    var tooltipx=d3.event.pageX;
+                    var tooltipy=d3.event.pageY;
+
+                    //提示框跟着鼠标走
+                    //console.log(d);
+
+                    _tooltipdiv.style('left',tooltipx+10+'px')
+                            .style('top',tooltipy+10+'px')
+                            .style('display','block')
+                            .html('商品：'+d.data.name+'');
+                    d3.select(this)
+                        /*.transition()
+                         .duration(1*1000)*/
+                            .attr("transform","translate(200,150) scale(1.1)");
+                })
+                .on('mouseout', function (d,i) {
+                    //console.log(d3.event)
+                    _tooltipdiv.style('display','none');
+                    d3.select(this)
+                            .attr("transform","translate(200,150) scale(1)");
+
+                })
+                .transition()
+                .duration(function (d,i) {
+                    return 5*1000;
+                })
+                .tween('path', function (d,i) {
+                    //console.log(d);
+                    var node = this;
+                    var initEndAngle = d.endAngle;
+                    var initstartAngle = d.startAngle;
+                    return function(t){
+                        d.endAngle=d.beforendAngle+t*(initEndAngle-d.beforendAngle);
+                        d.startAngle=d.beforestartAngle+t*(initstartAngle-d.beforestartAngle);
+                        d3.select(node)
+                                .attr("d",_arc(d));
+                    }
+                });
+        /* .call(_drag)*/
+
+        //文字部分
+        _svg.selectAll("text")
+                .data(_arcdata)
+                .enter()
+                .append("text")
+                .attr("x",function(d,i){
+                    return _arc.centroid(d)[0];
+                })
+                .attr("y",function(d,i){
+                    return _arc.centroid(d)[1];
+                })
+                .text(function(d,i){
+                    /* if(ydata[i]>2500){
+                     return datasetname[i] ;
+                     }else{
+                     return '';
+                     }*/
+                    return d.value;
+                })
+                .attr("text-anchor","middle")
+                .style("fill","#f00")
+                .attr('font-size','12')
+                .attr('transform','translate(200,150)')
+
+    }
+
+</script>
+</html>
+

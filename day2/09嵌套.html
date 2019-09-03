@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var datanest={
+        "化妆品":{
+            "护肤":[
+                {name:"化妆水",price:100,quantity:300},
+                {name:"BB霜",price:3230,quantity:20}
+            ]
+        },
+        "电器":{
+            "家电":[
+                {name:"冰箱",price:2100,quantity:300},
+                {name:"洗衣机",price:3230,quantity:20}
+            ]
+        }
+    };
+ var dataset=[
+     {familyname:"化妆品",categoryname:"护肤",productname:"化妆水",price:100,quantity:300},
+     {familyname:"化妆品",categoryname:"护肤",productname:"BB霜",price:500,quantity:20},
+     {familyname:"电器",categoryname:"家电",productname:"冰箱",price:3200,quantity:300},
+     {familyname:"电器",categoryname:"家电",productname:"洗衣机",price:2100,quantity:20}
+ ];
+var nest_entries=d3.nest()
+        .key(function(d){return d.familyname;})
+        .rollup(function(leaves){
+            return d3.max(leaves,function(d){
+                return d.quantity;
+            });
+        })
+        .entries(dataset);
+    console.log(nest_entries);
+    var nest_map=d3.nest()
+            .key(function(d){return d.familyname;})
+            .map(dataset);
+    console.log(nest_map);
+    var nest_object=d3.nest()
+            .key(function(d){return d.familyname;})
+            .rollup(function(leaves){
+                return d3.sum(leaves,function(d){
+                    return d.quantity;
+                });
+            })
+            .object(dataset);
+    console.log(nest_object);
+    var nest_object2=d3.nest()
+            .key(function(d){return d.familyname;})
+            .key(function(d){return d.categoryname;})
+            .rollup(function(leaves){
+                return d3.sum(leaves,function(d){
+                    return d.quantity;
+                });
+            })
+            .object(dataset);
+    console.log(nest_object2);
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+</head>
+<body>
+<script>
+    var dataset=[50,20,30,60,80,100];
+
+    var _pie=d3.pie();//饼图生成器
+    var _arcdata=_pie(dataset);//使用饼图生成器生成相应路径数据
+    var _arc=d3.arc()//弧状生成器可以直接用上面的数据生成饼图
+            .innerRadius(20)
+            .outerRadius(100);
+
+    d3.select("body")
+            .append("svg")
+            .attr("width",300)
+            .attr("height",300)
+            .selectAll("path")
+            .data(_arcdata)
+            .enter()
+            .append("path")
+            /*.attr("d",function(d,i){
+                //基于path绑定的寄出数据传给arc生成path
+               return  _arc(d);
+            })*/
+            .attr("d",_arc)
+            .attr("transform","translate(150,150)")
+            .style("fill",function(d,i){
+                return d3.schemeCategory20[i];
+            });
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+    <div>
+        <p>hello</p>
+        <p>d3</p>
+        <p>world</p>
+        <p>scales</p>
+        <p>are</p>
+        <p>very</p>
+        <p>fine</p>
+        <p>so</p>
+        <p>funny</p>
+        <p>!</p>
+    </div>
+<script>
+    var _bandscale = d3.scaleBand()
+            .padding(0.2)//20%包括内外边距及段间距paaddingInner只包括段间距
+            .domain(['0~50','50~100','100~200','200~500','500~1000','>1000'])
+            .range([0,600]);
+    console.log(_bandscale('0~50'));
+    console.log(_bandscale('100~200'));
+    console.log(_bandscale('100'));//undefined
+    console.log(_bandscale.bandwidth());
+    console.log(_bandscale.step());
+
+    var _ordinalscale = d3.scaleOrdinal().domain(['jack', 'rose', 'john']).range([10, 20, 30]);
+    console.log(_ordinalscale('jack'));//10
+    console.log(_ordinalscale('rose'));//20
+    console.log(_ordinalscale('john'));//30
+    console.log(_ordinalscale('a'));//10
+    console.log(_ordinalscale('adjjs'));//20
+
+    var score = d3.scaleQuantize()
+    .domain([10, 100])
+    .range(['C', 'B', 'A']);
+
+    console.log(score(20)); // C
+    console.log(score(50)); // B
+    console.log(score(60)); // B
+    console.log(score(80)); // A
+    
+    console.log(score(1));//C
+    console.log(score(120));//A
+
+    let color = d3.scaleOrdinal(d3.schemeCategory10);
+    d3.selectAll('p').style('background',function(d,i){
+        return d3.schemeCategory10[i]
+    });
+    console.log(color[1]);
+</script>
+
+</body>
+</html>

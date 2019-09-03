@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+    <script src="radar.js"></script>
+</head>
+<body>
+<div id="mychart" style="width:100%;height:100%;position:fixed;">
+
+</div>
+</body>
+<script>
+    var data=[
+        [
+            {"area": "Central ", "value": 80},
+            {"area": "Kirkdale", "value": 40},
+            {"area": "Kensington ", "value": 40},
+            {"area": "Everton ", "value": 90},
+            {"area": "Picton ", "value": 60},
+            {"area": "Riverside ", "value": 80}
+        ]
+    ];
+    var config = {
+        w: 800,
+        h: 800,
+        maxValue: 100,
+        levels: 5,
+        ExtraWidthX: 300
+    };
+        RadarChart.draw("#mychart", data, config);
+    var svg = d3.select('body')
+            .selectAll('svg')
+            .append('svg')
+            .attr("width", 800)
+            .attr("height", 800);
+</script>
+</html>

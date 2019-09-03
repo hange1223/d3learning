@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+</head>
+<body>
+<script>
+    var dataset=[50,20,30];
+
+    var _pie=d3.pie();
+    var _arcdata=_pie(dataset);
+    var _arc=d3.arc()
+            .innerRadius(60)
+            .outerRadius(100);
+    var _path = _arc(_arcdata[0]);
+    d3.select("body")
+            .append("svg")
+            .attr("width",300)
+            .attr("height",300)
+            .append("path")
+            .attr("d",_path)
+            .attr("transform","translate(150,150)");
+</script>
+</body>
+</html>

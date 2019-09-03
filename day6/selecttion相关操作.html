@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+    <p>a</p>
+    <p>b</p>
+    <p>c</p>
+<script>
+    var dataset=[{name:"a",value:50},{name:"b",value:60},{name:"c",value:70}];
+    var _p=d3.selectAll("p")
+            .data(dataset);
+    _p.each(function(d,i){
+       // console.log(d);
+        console.log(this);
+//        console.log(d3.select(this).property("__data__"));
+    });
+
+    d3.selectAll("p")
+            .each(function(){
+                d3.select(this)
+                        .style("color","red");
+            })
+            .attr("id","pname")
+            .property("pvalue",3000)
+            .call(_print);
+    //console.log(d3.selectAll("p").pvalue);
+    function _print(p){
+        //console.log(p);
+    }
+    //console.log(_p)
+
+</script>
+</body>
+</html>

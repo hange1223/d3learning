@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="js/d3.min.js"></script>
+    <style>
+        path {
+            -moz-box-shadow:    3px 3px 5px 6px #ccc;
+            -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+            box-shadow:         3px 3px 5px 6px #ccc;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var data = [0, 35, 65];
+
+    var w = 400,
+            h = 400,
+            r = Math.min(w, h) / 2,
+            ir = r * 0.5,
+            color = ["#91FDDF","#64FBD1","#3AFBC5","#0FFBB9","#04D99E","#03B483"];
+    donut = d3.pie().sort(null);
+    arc = d3.arc().innerRadius(ir).outerRadius(r);
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", w)
+            .attr("height", h)
+            .append("g")
+            .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
+    var defs = svg.append("defs");
+
+    var filter = defs.append("filter")
+            .attr("id", "dropshadow");
+
+    filter.append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 4)
+            .attr("result", "blur");
+    filter.append("feOffset")
+            .attr("in", "blur")
+            .attr("dx", 2)
+            .attr("dy", 2)
+            .attr("result", "offsetBlur");
+
+    var feMerge = filter.append("feMerge");
+
+    feMerge.append("feMergeNode")
+            .attr("in", "offsetBlur")
+    feMerge.append("feMergeNode")
+            .attr("in", "SourceGraphic");
+    svg.append("path")
+            .datum(data)
+            .attr("class", "line")
+            .attr("d", arc)
+            .attr("filter", "url(#dropshadow)");
+
+
+
+
+   /* var arcs = svg.selectAll("path")
+            .data(donut(data))
+            .enter().append("path")
+            .attr("fill", function(d, i) { return color[i]; })
+            .attr("d", arc);*/
+</script>
+</body>
+</html>

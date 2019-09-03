@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var _svg = d3.select("body")
+            .append("svg")
+            .attr("width","600")
+            .attr("height","300");
+    var _gAll = _svg.append("g")
+            .attr("transform","translate(25,25)");
+
+    var _gyaxis = _gAll.append("g")
+            .attr("id","gyaxis")
+            .attr("transform","translate(50,50)");
+    var _linescale = d3.scaleLinear()
+                        .domain([0,100]).nice()//nice用来优化数据  四舍五入等
+                        .range([150,0])//亦可以用rangeRound输出整数
+                        .clamp(true);
+    var _yaxis = d3.axisLeft()
+            .scale(_linescale)
+            //.ticks(5)
+                    .tickValues([0,25,50,75,100])
+            //.tickFormat(d3.format("%"))
+            ;
+    _yaxis(_gyaxis);
+    d3.select("#gyaxis")
+            .selectAll("text")
+            .attr("fill","blue")
+            //.style("font-size","24px")
+           // .style("transform","rotate(-45deg)")
+           ;
+    d3.select("#gyaxis")
+            .selectAll("line")
+            .attr("stroke","blue");
+    d3.select("#gyaxis")
+            .selectAll("path")
+            .attr("stroke","blue")
+            .style("width","4");//不起作用？？？
+    var _gxaixs = _gAll.append("g")
+            .attr("id","gxaxis")
+            .attr("transform","translate(50,200)");
+    var _bandscale = d3.scaleBand()
+            .padding(0.2)//20%包括内外边距及段间距paaddingInner只包括段间距
+            .domain(['0~50','50~100','100~200','200~500','500~1000','1000~2000','>2000'])
+            .range([0,450]);
+    var _xaxis = d3.axisBottom()
+            .scale(_bandscale);
+    _xaxis(_gxaixs);
+    d3.select("#gxaxis")
+            .selectAll("text")
+            .attr("fill","blue")
+            .style("transform","rotate(45deg)")
+            .attr("transform","translate(20,20)");//????
+    d3.select("#gxaxis")
+            .selectAll("line")
+            .style("stroke","blue");
+    d3.select("#gxaxis")
+            .selectAll("path")
+            .style("stroke","blue");
+</script>
+
+</body>
+</html>

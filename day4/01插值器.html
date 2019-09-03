@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var compNum=d3.interpolateNumber(0,3000);
+    console.log(compNum(0));
+    console.log(compNum(0.5));
+    console.log(compNum(0.0755));
+    var compround=d3.interpolateRound(0,3000);
+    console.log(0);
+    console.log(0.5);
+    console.log(compround(0.075));
+    var compstring=d3.interpolateString("2px","13px");
+    console.log(compstring(0));
+    console.log(compstring(0.6));
+    console.log(compstring(0.75));
+    var compDate=d3.interpolateDate(new Date('2017,6,1'),new Date('2017,6,30'));
+    console.log(compDate(0));
+    console.log(compDate(0.6));
+    console.log(compDate(0.75));
+
+    var a=[10,15,20],b=[60,100,-30];
+    var compArray=d3.interpolateArray(a,b);
+    console.log(compArray(0));
+    console.log(compArray(0.6));
+    console.log(compArray(1));
+    var compColor=d3.interpolateRgb(d3.rgb(0,209,47),d3.rgb(130,130));
+    var obja1={"name":'商品1',value:1000};
+    var obja2={"name":'商品100',value:5000};
+    var compObject=d3.interpolateObject(obja1,obja2);
+    console.log(compObject(0));
+    console.log(compObject(0.6));
+    console.log(compObject(1));
+</script>
+</body>
+</html>

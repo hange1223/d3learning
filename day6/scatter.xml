@@ -1,0 +1,32 @@
+<dataset>
+    <row>
+        <name>白酒</name>
+        <quantity>204</quantity>
+        <price>20055</price>
+    </row>
+    <row>
+        <name>商品1</name>
+        <quantity>2034</quantity>
+        <price>20034</price>
+    </row>
+    <row>
+        <name>商品2</name>
+        <quantity>205</quantity>
+        <price>10043</price>
+    </row>
+    <row>
+        <name>商品3</name>
+        <quantity>2043</quantity>
+        <price>20055</price>
+    </row>
+    <row>
+        <name>商品4</name>
+        <quantity>102</quantity>
+        <price>20088</price>
+    </row>
+    <row>
+        <name>商品5</name>
+        <quantity>20</quantity>
+        <price>200</price>
+    </row>
+</dataset>

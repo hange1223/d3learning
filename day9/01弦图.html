@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var label=['北京','上海','广州'];
+    var dataset=[
+            [2000,1000,750],
+            [3000,5000,4000],
+            [750,6000,3000]
+    ];
+    var _chord=d3.chord()
+            .padAngle(0.01);//设置缝隙
+//            .sortGroups(d3.descending);//设置排序方式
+    var _ribbon=d3.ribbon()
+            .radius(260);
+    var _chorddata=_chord(dataset);
+    var _outerchord=_chorddata.groups;
+    var _arc=d3.arc()
+            .outerRadius(300)
+            .innerRadius(300-40);
+    var _svg=d3.select("body")
+            .append("svg")
+            .attr("width",800)
+            .attr("height",800);
+
+    var _g=_svg.append("g")
+            .attr("transform","translate(400,400)");
+    //由于考虑到内弦也是path，所以使用类名
+        _g.selectAll(".outerchord")
+                .data(_outerchord)
+                .enter()
+                .append("path")
+                .attr("class","outerchord")
+                .attr("d",_arc)
+                .style("fill",function(d,i){
+                     return d3.schemeCategory10[i];
+                });
+    //外环提示
+        _g.selectAll(".outertext")
+                .data(_outerchord)
+                .enter()
+                .append("text")
+                .attr("x",function(d,i){
+                    return _arc.centroid(d)[0];
+                })
+                .attr("y",function(d,i){
+                    return _arc.centroid(d)[1];
+                })
+                .text(function(d,i){
+                    return label[i];
+                });
+    //为了通过title给每个内弦添加鼠标提示，将为每个内弦添加g组
+    var _ginner=_g.selectAll(".ginner")
+            .data(_chorddata)
+            .enter()
+            .append("g");
+    //给每个内弦的组添加路径信息
+        _ginner.append("path")
+                .attr("d",_ribbon)
+                .style("fill",function(d,i){
+                    return d3.schemeCategory20[i];
+                })
+                .style("stroke","white")
+                .style("stroke-width",3);
+    _ginner.append("title")
+            .text(function(d){
+                var _source= d.source;
+                var _sourcetext=label[_source.subindex]+"->"+
+                                label[_source.index]+":"+_source.value;
+                var _target= d.target;
+                _targettext=label[_target.subindex]+"->"+
+                label[_target.index]+":"+_target.value;
+                return _sourcetext+"\n"+ _targettext;
+            });
+       /* _g.selectAll(".innerchord")
+                .data(_chorddata)
+                .enter()
+                .append("path")
+                .attr("d",_ribbon)
+                .style("fill",function(d,i){
+                    return d3.schemeCategory20[i];
+                })
+                .style("stroke","white")
+                .style("stroke-width",3);*/
+</script>
+</body>
+</html>

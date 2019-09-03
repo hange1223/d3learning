@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="../js/d3.min.js" charset="UTF-8"></script>
+		<script src="../js/jquery-1.11.3.js"></script>
+		<style>
+			* {
+				padding: 0px;
+				margin: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="mychart1" style="position:absolute;width:100%;height: 100%;">
+
+		</div>
+	</body>
+	
+	
+	<script>
+
+			var dataset = [
+				{name:"新增订单量",value:19646},
+				{name:"支付订单量",value:15570},
+				{name:"好评订单量",value:10129},
+				{name:"好评2订单量",value:7005},
+				{name:"好评3订单量",value:6000}
+			];
+			drawrect("mychart1",dataset);
+			function drawrect(divname,dataset) {
+				var _swidth = $("#" + divname).width();
+				var _sheight = $("#" + divname).height();
+				var _margin = {top: 10, left: 130, right: 110, bottom: 30};
+				var _titleHeight = 50;
+				//得到绘图区的高度和宽度
+				var _chartHeight = _sheight - _margin.top - _margin.bottom - _titleHeight;
+				var _chartWidth = _swidth - _margin.left - _margin.right;
+
+				//核心绘图区的边距
+				var _chartmargin = {top: 20, left: 100, right: 100, bottom: 40};
+
+				//核心绘图区的高度和宽度
+				var _yaxisHeight = _chartHeight - _chartmargin.top - _chartmargin.bottom;
+				var _xaxisWidth = _chartWidth - _chartmargin.left - _chartmargin.right;
+
+				var _padding = 0.5;
+				var _datamax = d3.max(dataset, function (d) {
+					return d.value;
+				});
+				var _xscale=d3.scaleLinear().domain([0,_datamax]).range([0,_xaxisWidth]);
+
+				var _svg = d3.select("#" + divname)
+						.append("svg")
+						.attr("width", _swidth)
+						.attr("height", _sheight);
+
+
+				var _glevel1 = _svg.append("g")
+						.attr("transform", "translate(" + _margin.left + "," + _margin.top + ")");
+
+				var _glevel2_title = _glevel1.append("g");
+
+				var _glevel2_chart = _glevel1.append("g")
+						.attr("transform", "translate(0," + _titleHeight + ")");
+
+				var _gleve3_funnel = _glevel2_chart.append("g")
+						.attr("id", "gyaxis")
+						.attr("transform", "translate(" + _chartmargin.left + "," + _chartmargin.top + ")");
+				var datasetmap =d3.map(dataset, function(d) {return d.name;});//为了后边的each遍历且主键name不可重复
+				var counter= 0;
+				datasetmap.each(function (d, i) {
+					var point1 = _xscale((_datamax - d.value) / 2) + "," + counter * _yaxisHeight / (datasetmap.size() - 1);
+					var point2 = _xscale((_datamax + d.value) / 2) + "," + counter * _yaxisHeight / (datasetmap.size() - 1);
+					d.point1 = point1;
+					d.point2 = point2;
+					d.width = _xaxisWidth + 10;
+					d.height = counter * _yaxisHeight / (datasetmap.size() - 1);
+					if(counter!=dataset.length-1){
+					var pointerL2x=(_xscale(_datamax-d.value)/2+_xscale((_datamax-dataset[counter+1].value)/2))/2;
+					var pointerL2y=	(d.height+_yaxisHeight / (datasetmap.size() - 1)/2);
+					var pointerL1x="40";
+					var pointerL1y=d.height+_yaxisHeight / (datasetmap.size() - 1)/2;
+					d.pointerL2x=pointerL2x;
+					d.pointerL2y=pointerL2y;
+					d.pointerL1x=pointerL1x;
+					d.pointerL1y=pointerL1y;
+					d.bili = (dataset[counter+1].value/d.value*100).toFixed(2)+"%";
+					}else{
+						d.pointerL2x="0";
+						d.pointerL2y="0";
+						d.pointerL1x="0";
+						d.pointerL1y="0";
+						d.bili = null;
+					}
+					counter++;
+				});
+				var objpairs = d3.pairs(datasetmap.values());//values()是map的方法，生成一个二维数组
+				for (var i = 0; i < objpairs.length; i++) {
+					_gleve3_funnel.append("polygon")
+							.attr("points", objpairs[i][0].point1 + " " + objpairs[i][0].point2 + " " + objpairs[i][1].point2 + " " + objpairs[i][1].point1)
+							.style("fill", function () {
+								return d3.schemeCategory10[i];
+							});
+				}
+				var datasetnew = datasetmap.values();
+				_gleve3_funnel.selectAll(".lineright")
+						.data(datasetnew)
+						.enter()
+						.append("polyline")
+						.attr("points", function (d) {
+							return d.point2 + " " + d.width + "," + d.height;
+						})
+						.style("stroke","grey");
+				_gleve3_funnel.selectAll(".lineleft")
+						.data(datasetnew)
+						.enter()
+						.append("polyline")
+						.attr("points", function (d) {
+							return d.pointerL1x+","+d.pointerL1y+" "+d.pointerL2x+","+d.pointerL2y;
+						})
+						.style("stroke","grey");
+				_gleve3_funnel.selectAll(".textleft")
+						.data(datasetnew)
+						.enter()
+						.append("text")
+						.attr("x","0")
+						.attr("y",function(d){
+							return d.pointerL2y;
+						})
+						.text(function(d,i){
+							if(i==datasetnew.length-1){return "";}
+							else{return "转化率"+ d.bili;}
+						})
+						.attr("text-anchor","middle")
+						.attr("dy","0.2em")
+						.style("fill","grey");
+				_gleve3_funnel.selectAll(".textright")
+						.data(datasetnew)
+						.enter()
+						.append("text")
+						.attr("x", function (d) {
+							return d.width+20;
+						})
+						.attr("y", function (d) {
+							return d.height;
+						})
+						.text(function(d){
+							return d.name;
+						})
+						.attr("text-anchor","left")
+						.attr("dy","0.2em")
+						.style("fill","grey");
+				_gleve3_funnel.selectAll(".textinner")
+						.data(datasetnew)
+						.enter()
+						.append("text")
+						.attr("x", function (d) {
+							return d.width/2;
+						})
+						.attr("y", function (d) {
+							return d.height;
+						})
+						.text(function(d){
+							return d.value;
+						})
+						.attr("text-anchor","left")
+						.attr("dy","1em")
+						.style("fill","black");
+
+
+			}
+				
+				
+		</script>
+</html>

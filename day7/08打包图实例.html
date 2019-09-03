@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+    <style>
+        circle{
+            fill:rgba(31,119,180,0.25);
+            stroke:rgb(31,119,180);
+            stroke-width:1px;
+        }
+        .leaf{
+            fill:orange;
+        }
+
+
+    </style>
+</head>
+<body>
+<script>
+    var dataset={
+        "name":"家用电器",
+        detail:[
+            {
+                name:"电视",
+                detail:[
+                    {name:"曲面电视",revenue:200},
+                    {name:"超薄电视",revenue:120},
+                    {name:"电视配件",revenue:80}
+                ]
+            },
+            {
+                name:"空调",
+                detail:[
+                    {
+                        name: "壁挂式空调",
+                        detail: [
+                            {name:'格力',revenue:100},
+                            {name:'海尔',revenue:80}
+                        ]
+                    },
+                    {name:"柜式空调",revenue:40}
+                ]
+            }
+        ]
+    };
+    //基于数据形成hierarchy数据
+    var _hierarchydata=d3.hierarchy(dataset,function(d){return d.detail;})
+            .sum(function(d){return d.revenue;});
+    //基于布局生成器形成所需要的hierzrchy数据
+    var _packcreater=d3.pack()
+            .size([600,600])
+            .padding(10)
+            .radius(function(d){return 40;});//指定图的大小
+    var _packdata=_packcreater(_hierarchydata);
+    console.log(_packdata);
+    var _allnodes=_packdata.descendants();
+    var _svg=d3.select("body")
+            .append("svg")
+            .attr("width",600)
+            .attr("height",600);
+    var _gcircles=_svg.selectAll("g")
+            .data(_allnodes)
+            .enter()
+            .append("g")
+            .attr("transform",function(d,i){
+                return "translate("+ d.x+","+ d.y+")"
+            });
+    _gcircles.append("circle")
+            .attr("cx",0)
+            .attr("cy",0)
+            .attr("r",function(d){return d.r;})
+            .attr("class",function(d){
+                return d.height==0?"leaf":"";
+            });
+    _gcircles.append("text")
+            .attr("x",0)
+            .attr("y",0)
+            .text(function(d){
+                //如何判断当前节点是叶子节点，是则返回节点名称，否则为空
+                //return d.height==0?d.data.name:"";
+                return d.children?"":d.data.name;
+            })
+            .style("text-anchor","middle");
+    _gcircles.append("title")
+            .text(function(d){
+                return d.data.name+'\n销售额：'+ d.value;
+            })
+</script>
+</body>
+</html>

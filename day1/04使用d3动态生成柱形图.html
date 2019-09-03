@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.min.js"></script>
+</head>
+<body>
+
+</body>
+    <script>
+        var dataset=[100,50,80,200];
+
+        var _svg = d3.select("body")
+                .append("svg")
+                .attr("width","800")
+                .attr("height","600")
+                .style("background","lightgrey");
+
+        var _g=_svg.append("g");//添加g组
+
+        _g.attr("transform","translate(50,120)");
+        
+        var barWidth = 20, barPadding = 30;
+        var x2 = barPadding * ( dataset.length + 1 ) + barWidth * dataset.length;
+
+        _g.append("line")
+                .attr("x1",0)
+                .attr("y1","180")
+                .attr("x2",x2)
+                .attr("y2","180")
+                .attr("stroke","steelblue");
+        
+        _g.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("x",function(d,i){
+                    //20为柱子宽度，30为柱子之间的间距
+                    return barPadding + barWidth * i + barPadding * i;
+                })
+                .attr("y",function(d,i){
+                    //d为柱子的高度，180为x轴的y值 
+                    return 180 - d;
+                })
+                .attr("height",function(d){return d})
+                .attr("width","20")
+                .style("fill","steelblue");
+
+        _g.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .attr("x",function(d,i){
+                    return 30+20*i+30*i;
+                })
+                .attr("y",function(d){
+                    return 160-d;
+                })
+                .text(function(d){return d})
+                .attr("text-anchor","middle")
+                .attr("fill","darkblue");
+    </script>
+</html>

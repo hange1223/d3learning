@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../js/d3.js"></script>
+    <script src="../../js/jquery-1.11.3.js"></script>
+    <link rel="stylesheet" href="regis.css"/>
+</head>
+<body>
+<div id="Wrap">
+    <div class="header">
+        <h1>用户行为分析</h1>
+    </div>
+
+    <div class="main">
+        <div class="line1">
+            <div class="bar" id="mybar">
+            </div>
+            <div class="scatter" id="mybar2"></div>
+        </div>
+        <div class="nav">
+            <div class="left_nav">
+                <p class="direc">累计购买用户</p>
+                <p class="num">83069.97</p>
+            </div>
+            <div class="center_nav">
+                <p class="direc">昨日活跃用户</p>
+                <p class="num">20337</p>
+            </div>
+            <div class="right_nav">
+                <p class="direc">昨日购买用户数</p>
+                <p class="num">8154.29</p>
+            </div>
+        </div>
+        <div class="line2">
+            <div class="tab" id="mybar3">
+
+            </div>
+            <div class="pie" id="mybar4"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var dataset=[60000,45000,42000,42000,15000,13000,12000];
+    var datasetR=[0.2,0.1,0.05,0.02,0.4,0.52,0.48];
+    var xlabel=['0<=X<50','100<=X<200','50<=X<100','200<=X<500','500<=X<1000','>2000','1000<=X<2000'];
+    var datay=[0,15000,30000,45000,60000];
+    $(function(){drawRect("mybar",dataset,datasetR,xlabel);});
+    function drawRect(divname,dataset,datasetR,xdata){
+        //获取div的宽高
+        var _swidth = $("#"+divname).width();
+        var _sheight = $("#"+divname).height();
+        //设置div留白
+        var _margin = {top:20,left:140,right:140,bottom:60};
+        //设置title高度
+        var _titleHeight=50;
+        //绘图区宽高
+        var _chartHeight=_sheight- _margin.top -_margin.bottom- _titleHeight;
+        var _chartWidth=_swidth-_margin.left -_margin.right-100;
+//      绘图区边距
+        var _chartMargin={top:20,left:20,right:20,bottom:20};
+        //核心绘图区宽高
+        var _yaxisHeight=_chartHeight-_chartMargin.top -_chartMargin.bottom;
+        var _xaxisWidth=_chartWidth-_chartMargin.left-_chartMargin.right;
+        //div里添加画布
+        var _svg = d3.select("#"+divname)
+                .append("svg")
+                .attr("width","100%")
+                .attr("height","100%");
+        var _padding=0.4;
+        //一级组
+        var _glevel1 = _svg.append("g")
+                .attr("transform","translate("+_margin.left+","+_margin.top+")");
+        //一级组里添加2级title组
+        var _glevel2_title=_glevel1.append("g");
+        _glevel2_title.append("text")
+                .text("过去一周活跃用户")
+                .attr("x",0)
+                .attr("y",_margin.top);
+        //一级组里添加2级绘图区组
+        var _glevel2_chart=_glevel1.append("g")
+                .attr("transform","translate(0,"+_titleHeight+")");
+        //绘图区组里添加y组
+        var _glevel3_yaxisL=_glevel2_chart.append("g")
+                .attr("class","gyaxisL1")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        var _glevel3_yaxisR=_glevel2_chart.append("g")
+                .attr("class","gyaxisR1")
+                .attr("transform","translate("+(_chartMargin.left+_xaxisWidth)+","+_chartMargin.top+")");
+        //绘图区组里添加x组
+        var _glevel3_xaxis =_glevel2_chart.append("g")
+                .attr("class","gxaxis1")
+                .attr("transform","translate("+_chartMargin.left+","+(_chartHeight-_chartMargin.bottom)+")");
+        //绘图区组里添加内容组
+        var _glevel3_content = _glevel2_chart.append("g")
+                .attr("class","chartcontent")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        //y轴连续型比例尺
+        var _linescaleL = d3.scaleLinear()
+                .domain([0,d3.max(dataset)]).nice()
+                .range([_yaxisHeight,0])
+                .clamp(true) ;
+//     左y轴设置
+        var _yaxisL = d3.axisLeft()
+                .scale(_linescaleL)
+                .tickFormat(d3.format(",.2s"))
+                .tickValues(datay);
+        //y轴添加
+        _yaxisL(_glevel3_yaxisL);
+
+        var _linescaleR= d3.scaleLinear()
+                .domain([0,d3.max(datasetR)]).nice()
+                .clamp(true)
+                .range([_yaxisHeight,0]);
+
+        var _yaxisR = d3.axisRight()
+                .scale(_linescaleR)
+                .ticks(5)
+                .tickFormat(function(d){
+                    return d*100+"%";
+                });
+        //y轴添加
+        _yaxisR(_glevel3_yaxisR);
+        //x轴序数型设置
+        var _bandscale = d3.scaleBand()
+                .padding(_padding)//20%包括内外边距及段间距paaddingInner只包括段间距
+                .domain(xdata)
+                .range([0,_xaxisWidth]);
+        //x轴设置及添加
+        var _xaxis = d3.axisBottom()
+                .scale(_bandscale);
+        _xaxis(_glevel3_xaxis);
+
+        var _tooltipdiv=d3.select("#"+divname)
+                .append("div")
+                .attr("class","tooltip");
+
+        _glevel3_content.append("g")
+                .selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .style("fill","#5255b8")
+                .attr("x",function(d,i){
+                    return  _bandscale(xdata[i]);
+                })
+                .attr("y",_yaxisHeight)
+                .attr("width",_bandscale.bandwidth())
+                .attr("height",0)
+                .on("mouseover",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px")
+                            .style("display","block")
+                            .html( xdata[i]+"<br/>销售额："+d);
+                })
+                .on("mousemove",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px");
+                })
+                .on("mouseout",function(d,i){
+                    _tooltipdiv.style("display","none");
+                })
+                .transition()
+                .duration(5000)
+                .attr("y",function(d,i){
+                    return _linescaleL(d);
+                })
+                .attr("height",function(d,i){
+                    return _linescaleL(d3.max(dataset)-d);
+                });
+        var datazip=d3.zip(xdata,datasetR);
+        var _line=d3.line()
+                .x(function(d,i){
+                    //返回实际的月份对应的x坐标
+                    return _bandscale(d[0])+_bandscale.bandwidth()/2;
+                })
+                .y(function(d,i){
+                    //返回实际的销售收入对应的y坐标
+                    return _linescaleR(d[1]);
+                })
+                .curve(d3.curveNatural);
+        _glevel3_content.append("path")
+                .attr("d",_line(datazip))
+                .attr("stroke","#9ecb74")
+                .attr("class","line")
+                .style("stroke-width",2)
+                .style("fill","none");
+
+        _glevel3_content.append("text")
+                .text("访客ID")
+                .style("transform","rotate(-90deg)")
+                .attr("x",0)
+                .attr("y",0)
+                .attr("text-anchor","middle")
+                .attr("dx","-70px")
+                .attr("dy","-57px");
+        d3.select(".gxaxis1")
+                .selectAll("text")
+                .remove();
+        _glevel3_content.append("g")
+                .append("text")
+                .text("2016年6月16日")
+                .attr("x",_xaxisWidth/2)
+                .attr("y",_yaxisHeight+20)
+                .attr("text-anchor","middle")
+                .style("font-size","12px")
+                .style("fill","grey");
+        _glevel2_chart.append("g")
+                .append("rect")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .attr("width","10")
+                .attr("height","5")
+                .style("fill",'green');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .style("fill",'grey')
+                .text("活跃用(环比)")
+                .attr("text-anchor","left")
+                .attr("dy","-1em")
+                .style("font-size","12px");
+        _glevel2_chart.append("g")
+                .append("circle")
+                .attr("cx",_chartWidth+50)
+                .attr("cy",20)
+                .attr("r","5")
+                .style("fill",'#5255b8');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",20)
+                .style("fill",'grey')
+                .text("活跃用户")
+                .attr("text-anchor","left")
+                .attr("dy","-1.3em")
+                .style("font-size","12px");
+
+        d3.select(".gxaxis1")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gxaxis1")
+                .selectAll("path")
+                .attr("stroke","grey");
+        d3.select(".gyaxisL1")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisL1")
+                .selectAll("path")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisR1")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisR1")
+                .selectAll("path")
+                .attr("stroke","transparent");
+    }
+    //----------------------男女对比情况柱线混合
+    var dataset3=[46000,72000];
+    var datasetR3=[0.2,0.1,0.05,0.02,0.4,0.52,0.48];
+    var xlabel3=['男','女'];
+    var datasetAVG=[48000,48000];
+    var datay2=[12000,24000,48000,72000];
+    $(function(){drawRect3("mybar3",dataset3,datasetR3,xlabel3,datasetAVG);});
+    function drawRect3(divname,dataset,datasetR,xdata,datasetAVG){
+        //获取div的宽高
+        var _swidth = $("#"+divname).width();
+        var _sheight = $("#"+divname).height();
+        //设置div留白
+        var _margin = {top:20,left:140,right:140,bottom:60};
+        //设置title高度
+        var _titleHeight=50;
+        //绘图区宽高
+        var _chartHeight=_sheight- _margin.top -_margin.bottom- _titleHeight;
+        var _chartWidth=_swidth-_margin.left -_margin.right-100;
+//      绘图区边距
+        var _chartMargin={top:20,left:20,right:20,bottom:20};
+        //核心绘图区宽高
+        var _yaxisHeight=_chartHeight-_chartMargin.top -_chartMargin.bottom;
+        var _xaxisWidth=_chartWidth-_chartMargin.left-_chartMargin.right;
+        //div里添加画布
+        var _svg = d3.select("#"+divname)
+                .append("svg")
+                .attr("width","100%")
+                .attr("height","100%");
+        var _padding=0.4;
+        //一级组
+        var _glevel1 = _svg.append("g")
+                .attr("transform","translate("+_margin.left+","+_margin.top+")");
+        //一级组里添加2级title组
+        var _glevel2_title=_glevel1.append("g");
+        _glevel2_title.append("text")
+                .text("过去一周活跃用户")
+                .attr("x",0)
+                .attr("y",_margin.top);
+        //一级组里添加2级绘图区组
+        var _glevel2_chart=_glevel1.append("g")
+                .attr("transform","translate(0,"+_titleHeight+")");
+        //绘图区组里添加y组
+        var _glevel3_yaxisL=_glevel2_chart.append("g")
+                .attr("class","gyaxisL2")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        var _glevel3_yaxisR=_glevel2_chart.append("g")
+                .attr("class","gyaxisR2")
+                .attr("transform","translate("+(_chartMargin.left+_xaxisWidth)+","+_chartMargin.top+")");
+        //绘图区组里添加x组
+        var _glevel3_xaxis =_glevel2_chart.append("g")
+                .attr("class","gxaxis2")
+                .attr("transform","translate("+_chartMargin.left+","+(_chartHeight-_chartMargin.bottom)+")");
+        //绘图区组里添加内容组
+        var _glevel3_content = _glevel2_chart.append("g")
+                .attr("class","chartcontent")
+                .attr("transform","translate("+(_chartMargin.left)+","+(_chartMargin.top)+")");
+        //y轴连续型比例尺
+        var _linescaleL = d3.scaleLinear()
+                .domain([0,d3.max(dataset)])
+                .range([_yaxisHeight,0])
+                .clamp(true);
+//     左y轴设置
+        var _yaxisL = d3.axisLeft()
+                .scale(_linescaleL)
+                .tickFormat(d3.format(",.2s"));
+//                .ticks(5);
+        //y轴添加
+        _yaxisL(_glevel3_yaxisL);
+
+        var _linescaleR= d3.scaleLinear()
+                .domain([0,d3.max(datasetR)]).nice()
+                .clamp(true)
+                .range([_yaxisHeight,0]);
+
+        var _yaxisR = d3.axisRight()
+                .scale(_linescaleR)
+                .ticks(5)
+                .tickFormat(function(d){
+                    return d*100+"%";
+                });
+        //y轴添加
+        _yaxisR(_glevel3_yaxisR);
+        //x轴序数型设置
+        var _bandscale = d3.scaleBand()
+                .padding(_padding)//20%包括内外边距及段间距paaddingInner只包括段间距
+                .domain(xdata)
+                .range([0,_xaxisWidth]);
+        //x轴设置及添加
+        var _xaxis = d3.axisBottom()
+                .scale(_bandscale);
+        _xaxis(_glevel3_xaxis);
+
+        var _tooltipdiv=d3.select("#"+divname)
+                .append("div")
+                .attr("class","tooltip");
+
+        _glevel3_content.append("g")
+                .selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .style("fill","#5255b8")
+                .attr("x",function(d,i){
+                    return  _bandscale(xdata[i]);
+                })
+                .attr("y",function(d,i){
+                    return _linescaleL(d);
+                })
+                .attr("height",function(d,i){
+                    console.log((d3.max(dataset)-d));
+                    return _linescaleL(d3.max(dataset)-d);
+                })
+                .attr("width",_bandscale.bandwidth())
+                .on("mouseover",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px")
+                            .style("display","block")
+                            .html( xdata[i]+"<br/>数量："+d);
+                })
+                .on("mousemove",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px");
+                })
+                .on("mouseout",function(d,i){
+                    _tooltipdiv.style("display","none");
+                });
+        var datazip=d3.zip(xdata,datasetR);
+        var datazip2=d3.zip(xdata,datasetAVG);
+        var _line=d3.line()
+                .x(function(d,i){
+                    //返回实际的月份对应的x坐标
+                    return _bandscale(d[0])+_bandscale.bandwidth()/2;
+                })
+                .y(function(d,i){
+                    //返回实际的销售收入对应的y坐标
+                    return _linescaleR(d[1]);
+                })
+                .curve(d3.curveNatural);
+        var _line2=d3.line()
+                .x(function(d,i){
+                    //返回实际的月份对应的x坐标
+                    return _bandscale(d[0])+_bandscale.bandwidth()/2;
+                })
+                .y(function(d,i){
+                    //返回实际的销售收入对应的y坐标
+                    return _linescaleL(d[1]);
+                })
+                .curve(d3.curveNatural);
+        _glevel3_content.append("path")
+                .attr("d",_line(datazip))
+                .attr("stroke","#9ecb74")
+                .attr("class","line")
+                .style("stroke-width",2)
+                .style("fill","none");
+
+        _glevel3_content.append("path")
+                .attr("d",_line2(datazip2))
+                .attr("stroke","purple")
+                .attr("class","line")
+                .style("stroke-width",2)
+                .style("fill","none");
+        _glevel3_content.append("text")
+                .text("访客ID")
+                .style("transform","rotate(-90deg)")
+                .attr("x",0)
+                .attr("y",0)
+                .attr("text-anchor","middle")
+                .attr("dx","-70px")
+                .attr("dy","-57px");
+        /*d3.select(".gxaxis2")
+                .selectAll("text")
+                .remove();*/
+        _glevel3_content.append("g")
+                .append("text")
+                .text("2016年6月16日")
+                .attr("x",_xaxisWidth/2)
+                .attr("y",_yaxisHeight+20)
+                .attr("text-anchor","middle")
+                .attr("dy","2em")
+                .style("font-size","12px")
+                .style("fill","grey");
+
+        _glevel2_chart.append("g")
+                .append("rect")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .attr("width","10")
+                .attr("height","5")
+                .style("fill",'purple');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .style("fill",'grey')
+                .text("人均购买金额")
+                .attr("text-anchor","left")
+                .attr("dy","-1em")
+                .style("font-size","12px");
+        _glevel2_chart.append("g")
+                .append("rect")
+                .attr("x",_chartWidth+45)
+                .attr("y",15)
+                .attr("width","10")
+                .attr("height","5")
+                .style("fill",'green');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",15)
+                .style("fill",'grey')
+                .text("购买人数")
+                .attr("text-anchor","left")
+                .attr("dy","-1em")
+                .style("font-size","12px");
+        _glevel2_chart.append("g")
+                .append("circle")
+                .attr("cx",_chartWidth+50)
+                .attr("cy",35)
+                .attr("r","5")
+                .style("fill",'#5255b8');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",30)
+                .style("fill",'grey')
+                .text("累计支付金额")
+                .attr("text-anchor","left")
+                .attr("dy","-0.8em")
+                .style("font-size","12px");
+        d3.select(".gxaxis2")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gxaxis2")
+                .selectAll("path")
+                .attr("stroke","grey");
+        d3.select(".gyaxisL2")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisL2")
+                .selectAll("path")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisR2")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisR2")
+                .selectAll("path")
+                .attr("stroke","transparent");
+    }
+    //-------堆积条形图
+    var dataset4=[0,20,42,42,50,60,55];
+    var xlabel4=['2016年3月14日','2016年3月15日','2016年3月16日','2016年3月17日','2016年3月18日','2016年3月19日',
+        '2016年3月20日'];
+    var colorarray = ['#004e6d','#006a94','#0078a8','#0086bc','#00CD73','#00FE93'];
+    $(function(){drawRect2("mybar2",dataset4,xlabel4);});
+    function drawRect2(divname,dataset,xdata){
+        //获取div的宽高
+        var _swidth = $("#"+divname).width();
+        var _sheight = $("#"+divname).height();
+        //设置div留白
+        var _margin = {top:20,left:140,right:140,bottom:60};
+        //设置title高度
+        var _titleHeight=50;
+        //绘图区宽高
+        var _chartHeight=_sheight- _margin.top -_margin.bottom- _titleHeight;
+        var _chartWidth=_swidth-_margin.left -_margin.right-100;
+//      绘图区边距
+        var _chartMargin={top:20,left:20,right:20,bottom:20};
+        //核心绘图区宽高
+        var _yaxisHeight=_chartHeight-_chartMargin.top -_chartMargin.bottom;
+        var _xaxisWidth=_chartWidth-_chartMargin.left-_chartMargin.right;
+        //div里添加画布
+        var _svg = d3.select("#"+divname)
+                .append("svg")
+                .attr("width","100%")
+                .attr("height","100%");
+        var _padding=0.4;
+        //一级组
+        var _glevel1 = _svg.append("g")
+                .attr("transform","translate("+_margin.left+","+_margin.top+")");
+        //一级组里添加2级title组
+        var _glevel2_title=_glevel1.append("g");
+        _glevel2_title.append("text")
+                .text("注册当天转化率")
+                .attr("x",0)
+                .attr("y",_margin.top);
+        //一级组里添加2级绘图区组
+        var _glevel2_chart=_glevel1.append("g")
+                .attr("transform","translate(0,"+_titleHeight+")");
+        //绘图区组里添加y组
+        var _glevel3_yaxis=_glevel2_chart.append("g")
+                .attr("class","gyaxis2")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        //绘图区组里添加x组
+        var _glevel3_xaxis =_glevel2_chart.append("g")
+                .attr("class","gxaxis2")
+                .attr("transform","translate("+_chartMargin.left+","+(_chartHeight-_chartMargin.bottom)+")");
+        //绘图区组里添加内容组
+        var _glevel3_content = _glevel2_chart.append("g")
+                .attr("class","chartcontent")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        //y轴连续型比例尺
+        var _linescale = d3.scaleLinear()
+                .domain([0,d3.max(dataset)]).nice()
+                .range([0,_xaxisWidth])
+                .clamp(true) ;
+        var _xaxis = d3.axisBottom()
+                .scale(_linescale)
+                .ticks(5)
+                .tickFormat(function(d){
+                    return d+"%";
+                });
+        _xaxis(_glevel3_xaxis);
+        d3.select(".gxaxis2 .domain")
+                .attr("d","M0.0,0V0.0H580.0V0");
+//     左y轴设置
+        var _bandscale = d3.scaleBand()
+                .padding(_padding)//20%包括内外边距及段间距paaddingInner只包括段间距
+                .domain(xdata)
+                .range([_yaxisHeight,0]);
+        var _yaxis = d3.axisLeft()
+                .scale(_bandscale);
+        //y轴添加
+        _yaxis(_glevel3_yaxis);
+
+        _glevel3_content.append("g")
+                .selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("y",function(d,i){
+                    return   _bandscale(xdata[i]);
+                })
+                .attr("x",0)
+                .attr("height",_bandscale.bandwidth())
+                .attr("width",function(d,i){
+                    return _linescale(d);
+                })
+                .style("fill","#5255b8");
+        _glevel3_content.append("g")
+                .selectAll(".rect2")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("y",function(d,i){
+                    return   _bandscale(xdata[i]);
+                })
+                .attr("x",function(d,i){
+                        return _linescale(d);
+                })
+                .attr("height",_bandscale.bandwidth())
+                .attr("width",function(d,i){
+                    return _xaxisWidth-_linescale(d);
+                })
+                .style("fill","#9ecb74");
+        //图例添加
+        _glevel2_chart.append("g")
+                .append("rect")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .attr("width","10")
+                .attr("height","5")
+                .style("fill",'#9ecb74');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .style("fill",'grey')
+                .text("是")
+                .attr("text-anchor","left")
+                .attr("dy","-1em")
+                .style("font-size","12px");
+        _glevel2_chart.append("g")
+                .append("circle")
+                .attr("cx",_chartWidth+50)
+                .attr("cy",20)
+                .attr("r","5")
+                .style("fill",'#5255b8');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",20)
+                .style("fill",'grey')
+                .text("否")
+                .attr("text-anchor","left")
+                .attr("dy","-1.3em")
+                .style("font-size","12px");
+        d3.select(".gxaxis2")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gxaxis2")
+                .selectAll("path")
+                .attr("stroke","grey");
+        d3.select(".gyaxis2")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxis2")
+                .selectAll("path")
+                .attr("stroke","transparent");
+    }
+    //---------最后一个柱形图
+    var dataset5=[60000,45000,42000,42000,15000,13000,12000];
+    var datasetR5=[30000,20000,48669,67000,58688,79899,98988];
+    var dataline2=[42000,42000,42000,42000,42000,42000,42000];
+    var xlabel5=['小于18','18-29','30-39','40-49','50-59','60-69','大于69'];
+    $(function(){drawRect5("mybar4",dataset5,datasetR5,dataline2,xlabel5);});
+    function drawRect5(divname,dataset,datasetR,dataline2,xdata){
+        //获取div的宽高
+        var _swidth = $("#"+divname).width();
+        var _sheight = $("#"+divname).height();
+        //设置div留白
+        var _margin = {top:20,left:140,right:140,bottom:60};
+        //设置title高度
+        var _titleHeight=50;
+        //绘图区宽高
+        var _chartHeight=_sheight- _margin.top -_margin.bottom- _titleHeight;
+        var _chartWidth=_swidth-_margin.left -_margin.right-100;
+//      绘图区边距
+        var _chartMargin={top:20,left:20,right:20,bottom:20};
+        //核心绘图区宽高
+        var _yaxisHeight=_chartHeight-_chartMargin.top -_chartMargin.bottom;
+        var _xaxisWidth=_chartWidth-_chartMargin.left-_chartMargin.right;
+        //div里添加画布
+        var _svg = d3.select("#"+divname)
+                .append("svg")
+                .attr("width","100%")
+                .attr("height","100%");
+        var _padding=0.4;
+        //一级组
+        var _glevel1 = _svg.append("g")
+                .attr("transform","translate("+_margin.left+","+_margin.top+")");
+        //一级组里添加2级title组
+        var _glevel2_title=_glevel1.append("g");
+        _glevel2_title.append("text")
+                .text("过去一周活跃用户")
+                .attr("x",0)
+                .attr("y",_margin.top);
+        //一级组里添加2级绘图区组
+        var _glevel2_chart=_glevel1.append("g")
+                .attr("transform","translate(0,"+_titleHeight+")");
+        //绘图区组里添加y组
+        var _glevel3_yaxisL=_glevel2_chart.append("g")
+                .attr("class","gyaxisL5")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        var _glevel3_yaxisR=_glevel2_chart.append("g")
+                .attr("class","gyaxisR5")
+                .attr("transform","translate("+(_chartMargin.left+_xaxisWidth)+","+_chartMargin.top+")");
+        //绘图区组里添加x组
+        var _glevel3_xaxis =_glevel2_chart.append("g")
+                .attr("class","gxaxis5")
+                .attr("transform","translate("+_chartMargin.left+","+(_chartHeight-_chartMargin.bottom)+")");
+        //绘图区组里添加内容组
+        var _glevel3_content = _glevel2_chart.append("g")
+                .attr("class","chartcontent")
+                .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+        //y轴连续型比例尺
+        var _linescaleL = d3.scaleLinear()
+                .domain([0,d3.max(dataset)]).nice()
+                .range([_yaxisHeight,0])
+                .clamp(true) ;
+//     左y轴设置
+        var _yaxisL = d3.axisLeft()
+                .scale(_linescaleL)
+                .tickFormat(d3.format(",.2s"))
+                .tickValues(datay);
+        //y轴添加
+        _yaxisL(_glevel3_yaxisL);
+
+        var _linescaleR= d3.scaleLinear()
+                .domain([0,d3.max(datasetR)]).nice()
+                .clamp(true)
+                .range([_yaxisHeight,0]);
+
+        var _yaxisR = d3.axisRight()
+                .scale(_linescaleR)
+                .ticks(5);
+        //y轴添加
+        _yaxisR(_glevel3_yaxisR);
+        //x轴序数型设置
+        var _bandscale = d3.scaleBand()
+                .padding(_padding)//20%包括内外边距及段间距paaddingInner只包括段间距
+                .domain(xdata)
+                .range([0,_xaxisWidth]);
+        //x轴设置及添加
+        var _xaxis = d3.axisBottom()
+                .scale(_bandscale);
+        _xaxis(_glevel3_xaxis);
+
+        var _tooltipdiv=d3.select("#"+divname)
+                .append("div")
+                .attr("class","tooltip");
+
+        _glevel3_content.append("g")
+                .selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .style("fill","#5255b8")
+                .attr("x",function(d,i){
+                    return  _bandscale(xdata[i]);
+                })
+                .attr("y",_yaxisHeight)
+                .attr("width",_bandscale.bandwidth())
+                .attr("height",0)
+                .on("mouseover",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px")
+                            .style("display","block")
+                            .html( xdata[i]+"<br/>销售额："+d);
+                })
+                .on("mousemove",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px");
+                })
+                .on("mouseout",function(d,i){
+                    _tooltipdiv.style("display","none");
+                })
+                .transition()
+                .duration(5000)
+                .attr("y",function(d,i){
+                    return _linescaleL(d);
+                })
+                .attr("height",function(d,i){
+                    return _linescaleL(d3.max(dataset)-d);
+                });
+        var datazip=d3.zip(xdata,datasetR);
+        var datazip2=d3.zip(xdata,dataline2);
+        var _line=d3.line()
+                .x(function(d,i){
+                    //返回实际的月份对应的x坐标
+                    return _bandscale(d[0])+_bandscale.bandwidth()/2;
+                })
+                .y(function(d,i){
+                    //返回实际的销售收入对应的y坐标
+                    return _linescaleR(d[1]);
+                })
+                .curve(d3.curveNatural);
+        var _line2=d3.line()
+                .x(function(d,i){
+                    //返回实际的月份对应的x坐标
+                    return _bandscale(d[0])+_bandscale.bandwidth()/2;
+                })
+                .y(function(d,i){
+                    //返回实际的销售收入对应的y坐标
+                    return _linescaleL(d[1]);
+                })
+                .curve(d3.curveNatural);
+        _glevel3_content.append("path")
+                .attr("d",_line(datazip))
+                .attr("stroke","#9ecb74")
+                .attr("class","line")
+                .style("stroke-width",2)
+                .style("fill","none");
+        _glevel3_content.append("path")
+                .attr("d",_line2(datazip2))
+                .attr("stroke","purple")
+                .attr("class","line")
+                .style("stroke-width",2)
+                .style("fill","none");
+
+        _glevel3_content.append("text")
+                .text("访客ID")
+                .style("transform","rotate(-90deg)")
+                .attr("x",0)
+                .attr("y",0)
+                .attr("text-anchor","middle")
+                .attr("dx","-70px")
+                .attr("dy","-57px");
+        d3.select(".gxaxis1")
+                .selectAll("text")
+                .remove();
+        _glevel3_content.append("g")
+                .append("text")
+                .text("2016年6月16日")
+                .attr("x",_xaxisWidth/2)
+                .attr("y",_yaxisHeight+20)
+                .attr("text-anchor","middle")
+                .style("font-size","12px")
+                .style("fill","grey");
+        _glevel2_chart.append("g")
+                .append("rect")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .attr("width","10")
+                .attr("height","5")
+                .style("fill",'green');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",0)
+                .style("fill",'grey')
+                .text("累计支付金额")
+                .attr("text-anchor","left")
+                .attr("dy","-1em")
+                .style("font-size","12px");
+        _glevel2_chart.append("g")
+                .append("circle")
+                .attr("cx",_chartWidth+50)
+                .attr("cy",20)
+                .attr("r","5")
+                .style("fill",'#5255b8');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",20)
+                .style("fill",'grey')
+                .text("活跃用户")
+                .attr("text-anchor","left")
+                .attr("dy","-1.3em")
+                .style("font-size","12px");
+        _glevel2_chart.append("g")
+                .append("circle")
+                .attr("cx",_chartWidth+50)
+                .attr("cy",40)
+                .attr("r","5")
+                .style("fill",'purple');
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",_chartWidth+45)
+                .attr("y",40)
+                .style("fill",'grey')
+                .text("人均支付金额")
+                .attr("text-anchor","left")
+                .attr("dy","-1.3em")
+                .style("font-size","12px");
+
+        d3.select(".gxaxis5")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gxaxis5")
+                .selectAll("path")
+                .attr("stroke","grey");
+        d3.select(".gyaxisL5")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisL5")
+                .selectAll("path")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisR5")
+                .selectAll("line")
+                .attr("stroke","transparent");
+        d3.select(".gyaxisR5")
+                .selectAll("path")
+                .attr("stroke","transparent");
+    }
+</script>
+</html>

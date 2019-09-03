@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="../js/d3.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-1.11.3.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			#mychart{
+				width: 100%;
+				height: 100%;
+				position: fixed;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="mychart">
+			
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	var data = [
+		[
+			{name:"北京",value:400},
+			{name:"上海",value:100},
+			{name:"广州",value:300},
+			{name:"深圳",value:300},
+			{name:"天津",value:300},
+			{name:"成都",value:300},
+			{name:"沈阳",value:400}
+		],
+		[
+			{name:"北京",value:100},
+			{name:"上海",value:200},
+			{name:"广州",value:100},
+			{name:"深圳",value:400},
+			{name:"天津",value:500},
+			{name:"成都",value:100},
+			{name:"沈阳",value:200}
+		]
+		
+	]
+	
+	drawRadar("mychart",data)
+	function drawRadar(divId,data){
+		//获取div的宽高
+		var _divW = $("#" + divId).width();
+		var _divH = $("#" + divId).height();
+		//设置svg的内留白
+		var _margin = {top:50,bottom:20,left:50,right:20};
+		//设置title的高度
+		var _titleH = 50;
+		//获取绘图区的宽高
+		var _chartH = _divH - _margin.top - _margin.bottom - _titleH;
+		var _chartW = _divW - _margin.left - _margin.right;
+		//设置绘图区的内留白
+		var _chartMargin = {top:20,bottom:20,left:20,right:20};
+		//获取核心绘图区（真正画条形图的区域）的宽高
+		var _yaxisH = _chartH - _chartMargin.top - _chartMargin.bottom;
+		var _xaxisW = _chartW - _chartMargin.left - _chartMargin.right;
+		
+		//最大外圈蜘蛛网的半径
+		var r = _yaxisH/2
+		//在对应div中添加svg画布 并设置宽高为自动适应
+		var _svg = d3.select("#" + divId)
+			   .append("svg")
+			   .attr("width",_divW)
+			   .attr("height",_divH)
+		//在svg中添加一级组	   
+		var _g1 = _svg.append("g")
+					  .attr("transform","translate("+_margin.left+","+_margin.top+")");
+		//在svg中添加二级标题组
+		var _g2_title = _g1.append("g");
+		//在svg中添加二级绘图区组
+		var _g2_chart = _g1.append("g")
+						  .attr("transform","translate(0,"+_chartMargin.top+")");
+		//在svg中添加三级内容组						 
+		var _g3_content = _g2_chart.append("g")
+								 .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")")
+								 .attr("id","gcontent");
+		//四级底图组
+		var _g4_bgcircle = _g3_content.append("g")
+									.attr("id","bgcircle")
+									.attr("transform","translate("+(_xaxisW/2)+","+(_yaxisH/2)+")");
+		//取出数组中的最大值
+		var maxr = 0;
+		var maxrIndex = 0;
+		for(var datai = 0;datai<data.length;datai++){
+			//将数组中的对象写入一个新属性 r
+			for(var arri = 0;arri<data[datai].length;arri++){
+				data[datai][arri].r = 1
+			}
+			var maxir = d3.max(data[datai],function(d){return d.value})
+			if(maxir>=maxr){
+				maxr=maxir
+				maxrIndex = datai
+			}
+		}
+		//定义maxr  相对于  实际div尺寸的比例尺
+		var _rscale = d3.scaleLinear()
+						.domain([0,maxr])
+					   	.range([0,r])
+						.clamp(true);
+
+		//饼图数据生成器
+		var _pie = d3.pie()
+					.value(function(d){
+						return d.r
+					})
+		//传入数组生成 各个角度
+		var _bgdata = _pie(data[maxrIndex])
+		//弧生成器
+		var _arc = d3.arc()
+					 .innerRadius(r-1)
+					 .outerRadius(r)
+		 
+		 
+		 //画圆心到线
+		_g4_bgcircle
+		  .selectAll(".bgline")
+		  .data(_bgdata)
+		  .enter()
+		  .append("line")
+		  .attr("x1",0)
+		  .attr("y1",0)
+		  .attr("x2",function(d){
+		  	return _arc.centroid(d)[0];
+		  })
+		  .attr("y2",function(d){
+		  	return _arc.centroid(d)[1];
+		  })
+		  .attr("stroke","#aaa")
+		  .attr("stroke-width","1")
+		
+		//写最外层标签
+			_g4_bgcircle.selectAll(".bgtext")
+				  .data(_bgdata)
+				  .enter()
+				  .append("text")
+				  .attr("x",function(d){
+				  	return _arc.centroid(d)[0]*1.1;
+				  })
+				  .attr("y",function(d){
+				  	return _arc.centroid(d)[1]*1.1;
+				  })
+				  .text(function(d,i){
+						return d.data.name;
+				  })
+				  .attr("text-anchor","middle")
+				  .attr("fill","#111")
+				  .attr("dy","0.5em")
+		
+		
+		//画蜘蛛网线并加标签
+		for(var bgi = 0;bgi<4;bgi++){
+			var jiange = r/4
+			
+			//每次画蜘蛛网线是改变弧形生成器的半径从而改变中心点坐标
+			_arc.innerRadius(r-jiange*bgi-1)
+				.outerRadius(r-jiange*bgi)
+			
+			_g4_bgcircle
+			  .selectAll(".bgcircle"+bgi)
+			  .data(_bgdata)
+			  .enter()
+			  .append("line")
+			  .attr("x1",function(d,i){
+			  	if(i==0){
+			  		var d1= _bgdata[_bgdata.length-1]
+			  	}else{
+			  		var d1= _bgdata[i-1]
+			  	}
+			  	return _arc.centroid(d1)[0];
+			  })
+			  .attr("y1",function(d,i){
+			  	if(i==0){
+			  		var d1= _bgdata[_bgdata.length-1]
+			  	}else{
+			  		var d1= _bgdata[i-1]
+			  	}
+			  	return _arc.centroid(d1)[1];
+			  })
+			  .attr("x2",function(d){
+			  	return _arc.centroid(d)[0];
+			  })
+			  .attr("y2",function(d){
+			  	return _arc.centroid(d)[1];
+			  })
+			  .attr("stroke","#aaa")
+			  .attr("stroke-width","1")
+			  
+			  
+			//写标签
+			_g4_bgcircle.selectAll(".bgtext"+bgi)
+				  .data(_bgdata)
+				  .enter()
+				  .append("text")
+				  .attr("x",function(d){
+				  	return _arc.centroid(d)[0];
+				  })
+				  .attr("y",function(d){
+				  	return _arc.centroid(d)[1];
+				  })
+				  .text(function(d,i){
+						return _rscale.invert(r-jiange*bgi);
+				  })
+				  .attr("text-anchor","middle")
+				  .attr("fill","#aaa")
+				  .attr("dy","0.5em")
+			
+		}
+		//描每个点
+		for(var ddi = 0;ddi<data.length;ddi++){
+			//声明数组存放每个点的位置为以后画多边形做准备
+			var pointarr = [];
+			for(var di = 0;di<data[ddi].length;di++){
+				//根据比例尺计算每个点的半径
+				var datar = _rscale(data[ddi][di].value)
+				//设置外半径
+				_arc.innerRadius(datar-1)
+					.outerRadius(datar)
+				//根据中心点位置将半径存入点数组
+				pointarr.push(_arc.centroid(_bgdata[di]))
+				//画点
+				_g4_bgcircle.selectAll(".point"+di)
+					  .data(_bgdata)
+					  .enter()
+					  .append("circle")
+					  .attr("cx",function(d){
+					  	return _arc.centroid(_bgdata[di])[0];
+					  })
+					  .attr("cy",function(d){
+					  	return _arc.centroid(_bgdata[di])[1];
+					  })
+					  .attr("text-anchor","middle")
+					  .attr("fill","#f00")
+					  .attr("r",3)
+			}
+			_g4_bgcircle.append("polygon")
+						.attr("points",function(d){
+							var points = "";
+							for(var i=0;i<pointarr.length;i++){
+								var point = pointarr[i][0]+","+pointarr[i][1]+" "
+								points+=point
+							}
+							return points
+						})
+						.attr("fill","rgba(0,0,0,.4)")
+						.attr("stroke","#111")
+						.on("mousemove",function(){
+							d3.select(this)
+	//						  .attr("fill","rgba(102,217,239,.4)")
+							  .attr("fill","rgba(0,0,0,.8)")
+						})
+						.on("mouseout",function(){
+							d3.select(this)
+							  .attr("fill","rgba(0,0,0,.4)")
+						})
+			}
+		
+	}
+</script>

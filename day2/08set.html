@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var dataset = d3.set([100,"商品1",{name:"商品1",value:100},true]);
+    console.log(dataset);
+    dataset.add([50,20,30]);
+    console.log(dataset);
+    dataset.add(100);
+    console.log(dataset);
+    console.log(dataset.has("商品1"));
+
+    var arr=[1,2,3,3,3,4,5,6,7,7];
+    var newarr=d3.set(arr);
+    console.log(newarr);
+
+</script>
+</body>
+</html>

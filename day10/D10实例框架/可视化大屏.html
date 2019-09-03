@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="bigdatacss">
+<head>
+	<meta charset="UTF-8">
+	<title>电商大屏</title>
+	<link href="css/common.css" rel="stylesheet"/>
+	<link href="css/style.css" rel="stylesheet"/>
+	<script src="js/font.js"></script>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<!--<script src="js/function.js"></script>
+	<script src="js/echarts.min.js"></script>
+	<script src="js/china.js"></script>-->
+	<script src="../../js/d3.js" charset="UTF-8"></script>
+
+	<style>
+		ul{list-style:none;margin:0;padding:0;}
+		ul li{width: 2rem;height: 2.25rem;vertical-align: bottom;}
+		.icon-box{
+			position:absolute;
+			top: 4rem;
+			left: 1.42rem;
+		}
+		.icon-box li img{
+			width: 2rem;
+			height: 2rem;
+		}
+	</style>
+</head>
+<body class="wrap">
+<!--主标题-->
+<div class="title-main-bg">
+	<div class="title-box">
+		<img class="icon-left" src="img/bigdata_title_bg@2x.png" />
+		<div class="title">
+			<img class="icon" src="img/bigdata_title_logo@2x.png" />
+			<span class="t1">红河电子商务服务平台</span>
+			<span class="t2">-可视化大屏</span>
+		</div>
+		<img class="icon-right" src="img/bigdata_title_bg@2x.png"  />
+	</div>
+</div>
+<!--菜单-->
+
+
+<!--主容器-->
+<div class="main">
+	<div class="card c1">
+		<div class="content-box">
+			<div class="top">
+				<!--Dynamic Data-->
+				<p>今日<br /><span class="t2">电商大数据</span></p>
+				<img src="img/bigdata_main@2x.png"/>
+			</div>
+			<div class="bttm">
+				<div class="box">
+					<p>销售额<br /><span>4.5</span>亿元</p>
+				</div>
+				<div class="box">
+					<p>农村电商扶持<br /><span>2.3</span>亿元</p>
+				</div>
+				<div class="box">
+					<p>从业人数<br /><span>1.7</span>万人</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card c2">
+		<div class="title-bar">
+			<img src="img/bigdata_line_trend@2x.png" />
+			<span>今日品牌行业单店销售额全国水平</span>
+		</div>
+		<div class="content-box" id="chart1">
+			<!--Dynamic Chart-->
+			<!--<embed src="img/demo_chart/ct_c2_1.svg" width="100%" type="image/svg+xml"/>-->
+		</div>
+	</div>
+	<div class="card c3">
+		<div class="title-bar">
+			<img src="img/bigdata_line_trend@2x.png" />
+			<span>今日店铺TOP5</span>
+		</div>
+		<div class="content-box">
+			<table  class="table-color1" cellspacing="0">
+				<thead>
+				<tr>
+					<!--Dynamic Chart-->
+					<td>排名</td>
+					<td>店铺名称</td>
+					<td>销量</td>
+					<td>销售额</td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<!--Dynamic Chart-->
+					<td>1</td>
+					<td>尚城食品专营店</td>
+					<td>500</td>
+					<td>10000</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>胜意食品专营店</td>
+					<td>3000</td>
+					<td>9580</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>云龙食品专营店</td>
+					<td>2000</td>
+					<td>8560</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td>若曦食品专营店</td>
+					<td>1200</td>
+					<td>7500</td>
+				</tr>
+				<tr>
+					<td>5</td>
+					<td>阿辉食品专营店</td>
+					<td>800</td>
+					<td>6500</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="card c4">
+		<div class="title-bar" id="chinamap">
+			<img src="img/bigdata_people@2x.png" />
+			<span>实时订单流向</span>
+		</div>
+		<div class="content-box" id="chart2">
+			<!--Dynamic Chart-->
+			<!--<embed src="img/demo_chart/ct_c4_1.svg" width="100%" type="image/svg+xml"/>-->
+		</div>
+	</div>
+	<div class="card c5">
+		<div class="title-bar">
+			<img src="img/bigdata_xianduan@2x.png" />
+			<span>各市店铺销售额对比</span>
+		</div>
+		<div class="content-box" id="chart3">
+			<!--Dynamic Chart-->
+		</div>
+	</div>
+	<div class="card c6">
+		<div class="title-bar">
+			<img src="img/bigdata_pie@2x.png" />
+			<span>类目销售额占比Top5</span>
+		</div>
+		<div class="content-box" id="chart4">
+			<!--Dynamic Chart-->
+			<!--<embed src="img/demo_chart/ct_c6_1.svg" width="100%" type="image/svg+xml"/>-->
+		</div>
+	</div>
+	<div class="card c7">
+		<div class="title-bar">
+			<img src="img/bigdata_xiangxian@2x.png" />
+			<span>商品魔力四象限分析</span>
+		</div>
+		<div class="content-box" id="chart5">
+			<!--Dynamic Chart-->
+			<!--<embed src="img/demo_chart/ct_c7_1.svg" width="100%" type="image/svg+xml"/>-->
+		</div>
+	</div>
+	<div class="card c8">
+		<div class="title-bar" id="treemap">
+			<img src="img/bigdata_shangpin@2x.png" />
+			<span>各市电商实力对比</span>
+		</div>
+		<div class="content-box" id="chart6">
+			<!--Dynamic Chart-->
+			<!--<embed src="img/demo_chart/ct_c8_1.svg" width="100%" type="image/svg+xml"/>-->
+		</div>
+	</div>
+</div>
+</body>
+</html>
+<script src="js/keshihua.js"></script>

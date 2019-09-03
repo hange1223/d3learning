@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.min.js"></script>
+    <script src="../js/jquery-1.11.3.js"></script>
+    <style>
+        #centerT{
+            width:800px;
+            height:600px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="centerT"></div>
+</body>
+</html>
+<script>
+    var colorset=['#7260af','#7260af','#aa99c8','#7260af','#d4c4db','#a563ad','#d4c4db'];
+    var datapie=[
+        {name:"直接访问",value:140},
+        {name:"搜索引擎",value:120},
+        {name:"第三方链接",value:105},
+        {name:"第er方链接",value:85},
+        {name:"第yi方链接",value:65},
+        {name:"qita",value:55}
+    ];
+    drawPie("centerT",datapie);
+    function drawPie(divname,dataset){
+        var _swidth = $("#"+divname).width();
+        var _sheight = $("#"+divname).height();
+        //设置div留白
+        var _margin = {top:20,left:140,right:140,bottom:60};
+        //设置title高度
+        var _titleHeight=50;
+        //绘图区宽高
+        var _chartHeight=_sheight- _margin.top -_margin.bottom- _titleHeight;
+        var _chartWidth=_swidth-_margin.left -_margin.right;
+//      绘图区边距
+        var _chartMargin={top:20,left:20,right:20,bottom:20};
+        var _svg = d3.select("#"+divname)
+                .append("svg")
+                .attr("width","100%")
+                .attr("height","100%");
+        var _glevel1 = _svg.append("g")
+                .attr("transform","translate("+_margin.left+","+_margin.top+")");
+        var _glevel2_title=_glevel1.append("g");
+        var _glevel2_legend=_glevel1.append("g")
+                .attr("transform","translate("+_chartWidth/3*2+","+_margin.top+")");
+        _glevel2_title.append("text")
+                .text("访问流量来源")
+                .attr("x",0)
+                .attr("y",_margin.top);
+
+        //一级组里添加2级绘图区组
+        var _glevel2_chart=_glevel1.append("g")
+                .attr("transform","translate(0,"+_titleHeight+")");
+        var _glevel3_content = _glevel2_chart.append("g")
+                .attr("class","chartcontent")
+                .attr("transform","translate("+(_chartWidth/3)+","+_chartHeight/2+")");
+        var _pie=d3.pie()
+                .padAngle(Math.PI*0.005)
+                .value(function(d){
+                    return d.value;
+                });
+        var _arcdata=_pie(dataset);
+        var _arc=d3.arc()
+                .innerRadius(_chartHeight*0.35)
+                .outerRadius(_chartHeight*0.5);
+        var totalduration=0;
+
+        var _tooltipdiv=d3.select("#"+divname)
+                .append("div")
+                .attr("class","tooltip");
+
+        _glevel3_content.append("g")
+                .selectAll("path")
+                .data(_arcdata)
+                .enter()
+                .each(function(d,i){
+                    d.duration =(d.endAngle- d.startAngle)/(2*Math.PI)*3;
+                    d.delay=totalduration;
+                    totalduration=totalduration+d.duration;
+                })
+                .append("path")
+                .style("fill",function(d,i){
+                    return colorset[i];
+                })
+                .on("mouseover",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px")
+                            .style("display","block")
+                            .html(d.data.name+"<br/>投诉占比："+ d.data.value+"%");
+                })
+                .on("mousemove",function(d,i){
+                    var _tooltipx=d3.event.x;
+                    var _tooltipy=d3.event.y;
+                    _tooltipdiv.style("top",_tooltipy+"px")
+                            .style("left",_tooltipx+10+"px");
+                })
+                .on("mouseout",function(d,i){
+                    _tooltipdiv.style("display","none");
+                })
+                .transition()
+                .duration(function(d){
+                    return d.duration*1000;
+                })
+                .delay(function(d){
+                    return d.delay*1000;
+                })
+                .tween("path",function(d,i){
+                    var node=this;
+                    var initEndAngle = d.endAngle;
+                    return function(t){
+                        d.endAngle=d.startAngle+(t*initEndAngle-t*d.startAngle);
+                        d3.select(node)
+                                .attr("d",_arc(d));
+                    }
+                });
+
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",-_chartHeight*0.3/2)
+                .attr("y",0)
+                .attr("dy","-2em")
+                .html("直接访问")
+                .style("font-size","12px")
+                .style("fill","grey");
+        _glevel3_content.append("g")
+                .append("text")
+                .attr("x",-_chartHeight*0.3/2)
+                .attr("y",0)
+                .attr("dy","0.5em")
+                .attr("dx","-0.5em")
+                .html("40%")
+                .style("font-size","40px")
+                .style("fill","#666");
+        _glevel3_content.append("g")
+                .selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("cx",_chartWidth/3*2)
+                .attr("cy",function(d,i){
+                    return -i*20;
+                })
+                .attr("r","5")
+                .style("fill",function(d,i){
+                    return colorset[i];
+                });
+        _glevel3_content.append("g")
+                .selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .attr("x",_chartWidth/3*2+10)
+                .attr("y",function(d,i){
+                    return -i*20;
+                })
+                .style("fill",function(d,i){
+                    return colorset[i];
+                })
+                .text(function(d){
+                    return d.name;
+                })
+                .attr("text-anchor","left")
+                .attr("dy","0.3em")
+                .style("font-size","12px");
+
+    }
+</script>

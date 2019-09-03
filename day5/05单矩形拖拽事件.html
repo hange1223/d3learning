@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js"></script>
+</head>
+<body>
+<script>
+    var _g = d3.select("body")
+            .append("svg")
+            .attr("width",600)
+            .attr("height",600)
+            .style("background-color","grey")
+            .append("g")
+            .attr("transform","translate(20,100)");
+//    var _x=20,_y=100;
+    var _rect=_g.append("rect")
+            .attr("x",0)
+            .attr("y",0)
+            .attr("width",100)
+            .attr("height",100)
+            .style("fill","yellow")
+            .call(d3.drag()
+                    .on("start",function(){
+                        console.log("开始");
+                    })
+                    .on("drag",function(){
+                        console.log(d3.event);
+                        d3.select(this)
+                       /* .attr("x",_x)
+                        .attr("y",_y)*/
+                        .attr("transform","translate("+d3.event.x+","+d3.event.y+")");
+                    }));
+                   /* .on("end",function(){
+                        _x+=d3.event.x-d3.event.subject.x;
+                        _y+=d3.event.y-d3.event.subject.y;}
+                        ));*/
+</script>
+</body>
+</html>

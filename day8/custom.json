@@ -1,0 +1,27 @@
+{
+"total":{
+			"cityname":["沙城镇",	"存瑞镇",	"桑园镇",	"土木镇",	"新保安镇",	"西八里镇",	"小南辛堡镇",	"大黄庄镇",	"东花园镇",	"北辛堡镇",	"狼山乡",	"官厅镇",	"东八里乡",	"鸡鸣驿乡",	"王家楼回族乡",	"瑞云观乡",	"孙庄子乡"],
+			"shuliang":[10,	2.9,	2.8,	2.4,	2.3,	2.3,	1.9,	1.9,	1.9,	1.8,	1.3,	1.2,	1.1,	0.9,	0.8,	0.6,	0.5],
+			"zhanbi":[27.4,	7.9,	7.6,	6.5,	6.4,	6.4,	5.2,	5.1,	5.1,	5,	3.4,	3.3,	2.9,	2.5,	2.2,	1.7,	1.4],
+			"nannvbi":[1,	1.1,	1,	1,	1.1,	1,	1,	1.1,	1,	1,	1,	1,	1.1,	1,	1.1,	1.1,	1.1]
+		},
+"mapmetadata" :[
+			{"id":"shachengzhen","name":"沙城镇"},
+			{"id":"xinbaoanzhen","name":"新保安镇"},
+			{"id":"xibalizhen","name":"西八里镇"},
+			{"id":"dahuangzhuangzhen","name":"大黄庄镇"},
+			{"id":"cunruizhen","name":"存瑞镇"},
+			{"id":"tumuzhen","name":"土木镇"},
+			{"id":"beixinbao","name":"北辛堡镇"},
+			{"id":"sangyuanzhen","name":"桑园镇"},
+			{"id":"guantingzhen","name":"官厅镇"},
+			{"id":"donghuayuanzhen","name":"东花园镇"},
+			{"id":"xiaonanxinbaozhen","name":"小南辛堡镇"},
+			{"id":"wangjialou","name":"王家楼回族乡"},
+			{"id":"langshanxiang","name":"狼山乡"},
+			{"id":"dongbalixiang","name":"东八里乡"},
+			{"id":"sunzhuangzixiang","name":"孙庄子乡"},
+			{"id":"ruiyunguanxiang","name":"瑞云观乡"},
+			{"id":"jimingyixiang","name":"鸡鸣驿乡"}
+		]		
+	}

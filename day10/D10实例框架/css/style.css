@@ -1,0 +1,100 @@
+/*----------------------------------------布局start---------------------------------------*/
+
+.bigdatacss .c1, .bigdatacss .c2, .bigdatacss .c3{ left: 1.79rem;}
+.bigdatacss .c4, .bigdatacss .c5 { left: 27.79rem;}
+.bigdatacss .c6, .bigdatacss .c7, .bigdatacss .c8{ left: 85.29rem;}
+.bigdatacss .c1, .bigdatacss .c4, .bigdatacss .c6 { top: 0;}
+.bigdatacss .c2{ top: 17.15rem;}
+.bigdatacss .c7{ top: 19.78rem;}
+.bigdatacss .c3, .bigdatacss .c5, .bigdatacss .c8{ top: 37.14rem;}
+
+.bigdatacss .c1, .bigdatacss .c2, .bigdatacss .c3
+{ width: 25.29rem;}
+.bigdatacss .c6, .bigdatacss .c7, .bigdatacss .c8
+{ width: 27.21rem;}
+.bigdatacss .c4, .bigdatacss .c5
+{ width: 56.79rem;}
+.bigdatacss .c3, .bigdatacss .c5, .bigdatacss .c8
+{ height: 17.93rem;}
+.bigdatacss .c1
+{ height: 16.36rem;}
+.bigdatacss .c2
+{ height: 19.29rem;}
+.bigdatacss .c4
+{ height: 36.36rem;}
+.bigdatacss .c6
+{ height: 19.07rem;}
+.bigdatacss .c7
+{ height: 16.57rem;}
+
+
+/**-------------------------------------bigdatacss---------------------------------**/
+.bigdatacss .c2 .content-box{ height: 17rem;}
+.bigdatacss .c4 .content-box{ height: 34.05rem;}
+.bigdatacss .c6 .content-box{ height: 16.78rem;}
+.bigdatacss .c7 .content-box{ height: 14.28rem;}
+.bigdatacss .c8 .content-box, .bigdatacss .c5 .content-box{ height: 15.64rem;}
+
+.bigdatacss .c1 .top{
+	height: 7.54rem;
+	width: 21.43rem;
+	margin: 0 1.93rem;
+	margin-top: 1.29rem;
+	border-bottom: 1px solid rgba(222,222,222,0.3);
+}
+.bigdatacss .c1 .top p{
+	font-size: 2.57rem;
+	line-height: 2rem;
+	color: #FFC830;
+	float: left;
+	margin: 1.5rem 3.3rem 0 -0.5rem;
+}
+.bigdatacss .c1 .top .t1{
+	font-size: 1.29rem;
+	color: #8EA6AE;
+	padding-left: 0.5rem;
+}
+.bigdatacss .c1 .top .t2{
+	font-size: 1.86rem;
+}
+.bigdatacss .c1 .top img{
+	width: 7.16rem;
+	height: 6.72rem;
+}
+.bigdatacss .c1 .bttm{
+	margin-top: 1.8rem;
+}
+.bigdatacss .c1 .bttm .box{
+	float: left;
+    margin-left: 1.6rem;
+    margin-right: 0.5rem;
+}
+.bigdatacss .c1 .box p{
+	font-size: 1rem;
+	line-height: 1.43rem;
+	color: #8EA6AE;
+}
+.bigdatacss .c1 .box p span{
+	font-size: 2.14rem;
+	line-height: 3rem;
+	color: #FFC830;
+	padding-right: 0.21rem;
+}
+.bigdatacss .c3 table{
+	margin-top: 0.5rem;
+	min-width: 22rem;
+	max-width: 25rem;
+}
+.bigdatacss .c4 embed{
+	height: 34.71rem;
+	width: 52.57rem;
+	margin-left: 4.21rem;
+}
+.bigdatacss .c5 embed{
+	height: 16rem;
+	width: 55.61rem;
+	margin: 0rem 0 0 1rem;
+}
+/**-------------------------------------bigdatacss---------------------------------**/
+
+

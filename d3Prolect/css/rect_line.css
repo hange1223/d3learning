@@ -1,0 +1,47 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+#rect_line_wrap{
+    width: 100%;
+    height:100%;
+    position:fixed;
+    left:0;top:0;
+    border: 1px solid #000;
+}
+#rect_line_wrap div:first-child{
+    height:5%;
+    width:100%;
+}
+#rect_line{
+    width:100%;
+    height:95%;
+}
+#rect_line_wrap span{
+    margin-right: 40px;
+    float: right;
+    cursor: pointer;
+}
+.tooltip{
+    position:absolute;
+    width:auto;
+    height:auto;
+    color:white;
+    background-color: rgba(0, 0, 0, .4);
+    padding:10px;
+    display: none;
+}
+#hg_line,#hg_line2,#hg_line3{
+    stroke-width:2;
+    fill:none;
+    stroke-dasharray: 4000;             /* //设置虚线的间隔长度 */
+    stroke-dashoffset: 4000;   /* 设置线段偏移长度 */
+    animation: dash 10s  ;
+    animation-iteration-count:1;    /*动画应该播放的次数*/
+    animation-fill-mode:forwards ;  /*在动画结束后（由 animation-iteration-count 决定），动画将应用该属性值。 留在动画结束的位置*/
+}
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}

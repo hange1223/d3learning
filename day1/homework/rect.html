@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../js/d3.js"></script>
+</head>
+<body>
+</body>
+    <script>
+        //以下为条形图
+        var dataset=[50,160,100,600,500,200];
+        var colorset=['#004e6d','#006a94','#0078a8','#0086bc','#00cd73','#00fe93'];
+        var _svg=d3.select("body").append("svg").attr("width","1600").attr("height","800");
+        var _g=_svg.append("g");
+            _g.selectAll("rect")
+                    .data(dataset)
+                    .enter()
+                    .append("rect")
+                    .attr("x",20)
+                    .attr("y",function(d,i){
+                        return 20+20*i+30*i;
+                    })
+                    .attr("width",function(d){
+                        return d;
+                    })
+                    .attr("height","20")
+                    .data(colorset)
+                    .attr("fill",function(d){
+                        return d;
+                    });
+//以下为柱状图
+        var _g2=_svg.append("g");
+        _g2.attr("transform","translate(700,50)");
+        _g2.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("x",function(d,i){
+                    return 20+20*i+30*i;
+                })
+                .attr("y",function(d){
+                    return 700-d;
+                })
+                .attr("width","20")
+                .attr("height",function(d){
+                    return d;
+                })
+                .data(colorset)
+                .attr("fill",function(d){
+                    return d;
+                });
+    </script>
+</html>

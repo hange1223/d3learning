@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+    <script>
+        var dataset = [{name:'安徽',value:421},
+
+            {name:'安徽',value:421},
+
+            {name:'北京',value:517},
+
+            {name:'重庆',value:217},
+
+            {name:'福建',value:214},
+
+            {name:'广东',value:338},
+
+            {name:'甘肃',value:849},
+
+            {name:'广西',value:285},
+
+            {name:'贵州',value:582},
+
+            {name:'河北',value:375},
+
+            {name:'黑龙江',value:888},
+
+            {name:'河南',value:792},
+
+            {name:'海南',value:615},
+
+            {name:'湖北',value:943},
+
+            {name:'湖南',value:969},
+
+            {name:'江苏',value:255},
+
+            {name:'江西',value:593},
+
+            {name:'吉林',value:593},
+
+            {name:'辽宁',value:392},
+
+            {name:'内蒙古',value:307},
+
+            {name:'宁夏',value:124},
+
+            {name:'青海',value:660},
+
+            {name:'山西',value:680},
+
+            {name:'陕西',value:648},
+
+            {name:'山东',value:754},
+
+            {name:'上海',value:201},
+
+            {name:'四川',value:106},
+
+            {name:'天津',value:412},
+
+            {name:'台湾',value:562},
+
+            {name:'香港',value:767},
+
+            {name:'西藏',value:232},
+
+            {name:'新疆',value:269},
+
+            {name:'云南',value:424},
+
+            {name:'浙江',value:638}
+        ];
+        var maxdata=d3.max(dataset,function(d){return d.value;});
+        //量化比例尺
+        var color=d3.scaleQuantize().domain([0,maxdata]).range(['red','greenyellow','yellowgreen','orange','green']);
+        //定义map对象，根据省份名称作为键值
+        var mapdata=d3.map(dataset,function(d){return d.name;});
+        //1 获取json数据
+       d3.json("china.json",function(error,data){
+           //2定义投影
+           var _projection=d3.geoMercator()
+                   .center([107,31])
+                  .fitExtent([[0,0],[800,600]],data);
+                  /* .translate([400,300])
+                   .scale(500);*/
+           //3 定义地图路径生成器
+           var _geopath=d3.geoPath()
+                   .projection(_projection);
+           //4 基于获取的数据可视化
+           var _svg=d3.select("body")
+                   .append("svg")
+                   .attr("width",800)
+                   .attr("height",600);
+           _svg.selectAll("path")
+                   .data(data.features)
+                   .enter()
+                   .append("path")
+                   .attr("d",_geopath)
+                   .style("fill",function(d){
+                       console.log(d);
+                       var proname= d.properties.name;
+                       var prodata=mapdata.get(proname);
+                       if(prodata){
+                           return color(prodata.value);
+                       }else{
+                           return 'grey';
+                       }
+                   })
+                   .on("click",function(d){
+                       d3.select(this.parentNode)
+                               .selectAll("path")
+                               .style("fill",function(d){
+                                   console.log(d);
+                                   var proname= d.properties.name;
+                                   var prodata=mapdata.get(proname);
+                                   if(prodata){
+                                       return color(prodata.value);
+                                   }else{
+                                       return 'grey';
+                                   }
+                               });
+                       d3.select(this).style("fill","grey");
+                   });
+           //基于地图里每个省份的中心点坐标添加文本信息
+           /*_svg.selectAll("text")
+                   .data(data.features)
+                   .enter()
+                   .append("text")
+                   .attr("x",function(d){
+                   //使用_projection经纬度换算xy坐标
+                       var point=d.properties.cp;
+                      return _projection(point)[0];
+                   })
+                   .attr("y",function(d){
+                       var point=d.properties.cp;
+                       return _projection(point)[1];
+                   })
+                   .text(function(d){
+                      return d.properties.name;
+                   })
+                   .style("fill","white");*/
+           _svg.selectAll("text")
+                   .data(data.features)
+                   .enter()
+                   .append("text")
+                   .attr("x",function(d){
+                       //使用_projection经纬度换算xy坐标
+                       return _geopath.centroid(d)[0];
+                   })
+                   .attr("y",function(d){
+                       return _geopath.centroid(d)[1];
+                   })
+                   .attr("dy","1em")
+                   .text(function(d){
+                       return d.properties.name;
+                   })
+                   .style("text-anchor","middle");
+       });
+    </script>
+</body>
+</html>

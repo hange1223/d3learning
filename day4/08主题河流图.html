@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/jquery-1.11.3.js"></script>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="mychart" style="width:100%;height:100%;position:fixed;left:0;top:0">
+
+</div>
+<script>
+    var xdata=['20170501',	'20170502',	'20170503',	'20170504',	'20170505',	'20170506',	'20170507',	'20170508',	'20170509',	'20170510',	'20170511',	'20170512',	'20170513',	'20170514',	'20170515',	'20170516',	'20170517',	'20170518',	'20170519',	'20170520',	'20170521',	'20170522',	'20170523',	'20170524',	'20170525',	'20170526',	'20170527',	'20170528',	'20170529',	'20170530',	'20170531'];
+   var ydata=[333,	791,	499,	395,	435,	463,	330,	230,	659,	795,	578,	482,	288,	443,	388,	497,	500,	162,	162,	770,	123,	579,	428,	571,	389,	692,	658,	604,	489,	691,	635];
+    var ydata1=[330,	391,	399,	195,	305,	163,	230,	330,	159,	195,	178,	182,	188,	143,	188,	197,	150,	162,	162,	170,	123,	159,	128,	171,	189,	192,	558,	404,	289,	491,	535];
+    var timeparse=d3.timeParse("%Y%m%d");
+    var datasetObj={
+        "xdata":['1月',	'2月',	'3月',	'4月',	'5月',	'6月',	'7月',	'8月',	'9月',	'10月',	'11月',	'12月'],
+        "sale":[555,	710,	654,	648,	463,	493,	554,	489,	203,	669,	663,	392],
+        "num":[333,	791,	499,	395,	435,	463,	330,	230,659,795,578,482]
+    };
+
+    $(function(){drawArea("mychart",ydata,ydata1,xdata);});
+   function drawArea(divname,ydata,ydata1,xdata){
+       //获取div的宽高
+       var _swidth = $("#"+divname).width();
+       var _sheight = $("#"+divname).height();
+       //设置div留白
+       var _margin = {top:20,left:20,right:20,bottom:40};
+       //设置title高度
+       var _titleHeight=50;
+       //绘图区宽高
+       var _chartHeight=_sheight- _margin.top -_margin.bottom- _titleHeight;
+       var _chartWidth=_swidth-_margin.left -_margin.right;
+//      绘图区边距
+       var _chartMargin={top:20,left:20,right:20,bottom:20};
+      //核心绘图区宽高
+       var _yaxisHeight=_chartHeight-_chartMargin.top -_chartMargin.bottom;
+       var _xaxisWidth=_chartWidth-_chartMargin.left-_chartMargin.right;
+       //div里添加画布
+       var _svg = d3.select("#"+divname)
+               .append("svg")
+               .attr("width","100%")
+               .attr("height","100%");
+       var _padding=0.4;
+       //一级组
+       var _glevel1 = _svg.append("g")
+               .attr("transform","translate("+_margin.left+","+_margin.top+")");
+       //一级组里添加2级title组
+       var _glevel2_title=_glevel1.append("g");
+       //一级组里添加2级绘图区组
+       var _glevel2_chart=_glevel1.append("g")
+               .attr("transform","translate(0,"+_titleHeight+")");
+       //绘图区组里添加y组
+       var _glevel3_yaxis=_glevel2_chart.append("g")
+               .attr("class","gyaxis")
+               .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+       //绘图区组里添加x组
+       var _glevel3_xaxis =_glevel2_chart.append("g")
+               .attr("class","gxaxis")
+               .attr("transform","translate("+_chartMargin.left+","+(_chartHeight-_chartMargin.bottom)+")");
+       //绘图区组里添加内容组
+       var _glevel3_content = _glevel2_chart.append("g")
+               .attr("class","chartcontent")
+               .attr("transform","translate("+_chartMargin.left+","+_chartMargin.top+")");
+       //y轴连续型比例尺
+       var _ycale = d3.scaleLinear()
+               .domain( [0,d3.max(ydata)] ).nice()
+               .range([_yaxisHeight,0])
+               .clamp(true) ;
+//     左y轴设置
+       var _yaxis = d3.axisLeft()
+               .scale(_ycale)
+               .ticks(5);
+       //y轴添加
+       _yaxis(_glevel3_yaxis);
+       //x轴序数型设置
+       var _xscale = d3.scaleTime()
+               .domain([timeparse(d3.min(xdata)),timeparse(d3.max(xdata))])
+               .range([0,_xaxisWidth]);
+       //x轴设置及添加
+       var _xaxis = d3.axisBottom()
+               .scale(_xscale)
+               .ticks(31);
+       _xaxis(_glevel3_xaxis);
+       drawGridy("gyaxis",_xaxisWidth,"grey");
+       drawGridx("gxaxis",_yaxisHeight,"grey");
+       var dataset = d3.zip(xdata,ydata,ydata1);
+       var _area=d3.area()
+               .x(function(d,i){
+                   //返回实际的月份对应的x坐标
+                  return _xscale(timeparse(d[0]));
+               })
+               .y1(function(d,i){
+                   //返回实际的销售收入对应的y坐标
+                  return _ycale(d[1]);
+               })//topline
+               .y0(function(d,i){
+                   //返回实际的销售收入对应的y坐标
+                   return _ycale(d[2]);
+               })//basisline
+               .curve(d3.curveNatural);
+       _glevel3_content.append("path")
+               .attr("d",_area(dataset))
+               .attr("stroke","lightblue")
+               .style("fill","grey");
+       
+   }
+    function drawGridy(divname,xwidth,color){
+        d3.select("."+divname)
+                .selectAll("g")
+                .append("line")
+                .attr("x1",0)
+                .attr("y1",0)
+                .attr("x2",xwidth)
+                .attr("y2",0)
+                .attr("stroke",color)
+                .attr("stroke-width","0.5");
+    }
+    function drawGridx(divname,yheight,color){
+        d3.select("."+divname)
+                .selectAll("g")
+                .append("line")
+                .attr("x1",0)
+                .attr("y1",0)
+                .attr("x2",0)
+                .attr("y2",-yheight)
+                .attr("stroke",color)
+                .attr("stroke-width","0.5");
+    }
+    /*var _gAll = _svg.append("g")
+            .attr("transform","translate(25,25)");
+
+    var _gyaxis = _gAll.append("g")
+            .attr("id","gyaxis")
+            .attr("transform","translate(50,50)");
+    var _linescale = d3.scaleLinear()
+                        .domain([0,100]).nice()//nice用来优化数据  四舍五入等
+                        .range([150,0])//亦可以用rangeRound输出整数
+                        .clamp(true);
+    var _yaxis = d3.axisLeft()
+            .scale(_linescale)
+            //.ticks(5)
+                    .tickValues([0,25,50,75,100])
+            //.tickFormat(d3.format("%"))
+            ;
+    _yaxis(_gyaxis);
+    d3.select("#gyaxis")
+            .selectAll("text")
+            .attr("fill","blue")
+            //.style("font-size","24px")
+           // .style("transform","rotate(-45deg)")
+           ;
+    d3.select("#gyaxis")
+            .selectAll("line")
+            .attr("stroke","blue");
+    d3.select("#gyaxis")
+            .selectAll("path")
+            .attr("stroke","blue");
+    var _gxaixs = _gAll.append("g")
+            .attr("id","gxaxis")
+            .attr("transform","translate(50,200)");
+    var _bandscale = d3.scaleBand()
+            .paddingInner(0.2)//20%包括内外边距及段间距paaddingInner只包括段间距
+            .domain(['0~50','50~100','100~200','200~500','500~1000','1000~2000','>2000'])
+            .range([0,450]);
+    var _xaxis = d3.axisBottom()
+            .scale(_bandscale);
+    _xaxis(_gxaixs);
+    d3.select("#gxaxis")
+            .selectAll("text")
+            .attr("fill","blue")
+            .style("transform","rotate(-45deg)")
+           // .attr("dy","34px")
+            .attr("dx","-34px");
+    d3.select("#gxaxis")
+            .selectAll("line")
+            .style("stroke","blue");
+    d3.select("#gxaxis")
+            .selectAll("path")
+            .style("stroke","blue");
+
+
+    var _gchartarea = _gAll.append("g")
+            .attr("transform","translate(50,50)");
+    _gchartarea.append("g")
+            .selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x",function(d,i){
+                return  _bandscale(xlabel[i]);
+            })
+            .attr("y",function(d,i){
+                return 150 - _linescale(100-d);
+            })
+            .attr("width",_bandscale.bandwidth())
+            .attr("height",function(d,i){
+                return _linescale(100-d);
+            })
+            .style("fill","steelblue");
+    _gchartarea.append("g")
+            .selectAll("text")
+            .data(dataset)
+            .enter()
+            .append("text")
+            .attr("x",function(d,i){
+                return _bandscale(xlabel[i]);
+            })
+            .attr("y",function(d,i){
+                return 150-_linescale(100-d);
+            })
+            .attr("dx",_bandscale.bandwidth()/2)
+            .attr("dy","1em")
+            .attr("text-anchor","middle")
+            .text(function(d){return d;})
+            .attr("fill","white");
+    d3.select("#gyaxis")
+            .selectAll("g")
+            .append("line")
+            .attr("x1",0)
+            .attr("y1",0)
+            .attr("x2",450)
+            .attr("y2",0)
+            .attr("stroke","grey")
+            .attr("stroke-width","0.5");*/
+</script>
+
+</body>
+</html>

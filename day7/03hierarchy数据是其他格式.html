@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var dataset={
+        "name":"家用电器",
+       detail:[
+            {
+                name:"电视",
+                detail:[
+                    {name:"曲面电视",revenue:200},
+                    {name:"超薄电视",revenue:120},
+                    {name:"电视配件",revenue:80}
+                ]
+            },
+            {
+                name:"空调",
+                detail:[
+                    {name:"壁挂式空调",revenue:80},
+                    {name:"柜式空调",revenue:40}
+                ]
+            }
+        ]
+    };
+    console.log(dataset);
+   console.log(d3.hierarchy(dataset));
+    //直接访问d3.hierarchy(dataset)得到的是根节点
+    var _root=d3.hierarchy(dataset,function(d){return d.detail;})
+            .count();//个数
+           /* .sum(function(d){
+                return d.revenue;
+            });*///每个节点求和
+    console.log(_root.ancestors());//祖先
+    console.log(_root.descendants());//子孙
+    console.log(_root.leaves());//叶子节点
+    _root.each(function(d){
+        console.log(d);
+    });
+</script>
+</body>
+</html>

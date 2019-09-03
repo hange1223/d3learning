@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../js/d3.js"></script>
+    <script src="../../js/jquery-1.11.3.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+</body>
+    <script>
+        var total={
+            "cityname":['沙城镇', '存瑞镇',  '桑园镇',  '土木镇',  '新保安镇', '西八里镇', '小南辛堡镇',  '大黄庄镇', '东花园镇', '北辛堡镇',
+                '狼山乡',  '官厅镇',  '东八里乡', '鸡鸣驿乡', '王家楼回族乡',  '瑞云观乡', '孙庄子乡'],
+                    "shuliang":[10,  2.9,  2.8,  2.4,  2.3,  2.3,  1.9,  1.9,  1.9,  1.8,  1.3,
+                1.2,  1.1,  0.9,  0.8,  0.6,  0.5],
+                    "zhanbi":[27.4,  7.9,  7.6,  6.5,  6.4,  6.4,  5.2,  5.1,  5.1,  5,  3.4,
+                3.3,  2.9,  2.5,  2.2,  1.7,  1.4],
+                    "nannvbi":[1,  1.1,  1,  1,  1.1,  1,  1,  1.1,  1,  1,  1,
+                1,  1.1,  1,  1.1,  1.1,  1.1]
+        };
+        var total_zip=d3.zip(total.cityname,total.shuliang,total.zhanbi,total.nannvbi);
+           // console.log(total_zip);
+        var total_map = d3.map(total_zip,function(d){
+            return d[0];
+        });
+            console.log(total_map);
+
+        var arr=[];
+        for (var i=1;i<total_map.get("东八里乡").length;i++){
+            arr.push(total_map.get("东八里乡")[i]);
+        }
+            console.log(arr);
+
+        total_zip.sort(function(a,b){
+            return b[1]-a[1];
+        });
+        console.log(total_zip[0]);
+
+       console.log(d3.max(total_zip,function(d){return d[1];}));
+    </script>
+</html>

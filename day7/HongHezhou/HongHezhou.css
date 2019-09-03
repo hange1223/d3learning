@@ -1,0 +1,141 @@
+*{
+    margin: 0;
+    padding: 0;
+    color:#e0e2e1;
+    font-family: "Microsoft YaHei", "ºÚÌå", "ËÎÌå";
+}
+#tooltip{
+    position:fixed;
+    width:auto;
+    height:auto;
+    color:white;
+    background-color: rgba(0, 0, 0, .4);
+    padding:10px;
+    display: none;
+}
+#wrap{
+    width:100%;
+    height:100%;
+    position:fixed;
+    left:0;
+    top:0;
+    background-color: #0f262e;
+}
+#header{
+    width:95%;
+    height:13%;
+    margin:0 auto;
+   padding-top: 2%;
+}
+#logo{
+    width:27%;
+    height:100%;
+    border-top:3px solid #56676e;
+    border-bottom:3px solid #56676e;
+    float: left;
+    margin-right: 1%;
+    text-align: center;
+}
+#logo p{
+    margin-top: 0.3em;
+    font-size: 2em;
+    color:#b7bbbe;
+}
+#logo h3{
+    font-size: 3em;
+    font-weight: lighter;
+}
+#num_sale{
+    width:72%;
+    height:100%;
+    border-top:3px solid #56676e;
+    border-bottom:3px solid #56676e;
+    float: right;
+}
+#num_sale>div{
+    float: left;
+}
+#num_sale>div:last-child{
+    float: right;
+}
+#num_sale>div:first-child{
+    width:13%;
+    height:50%;
+    margin-top: 2%;
+    border: 2px solid #cfd3d4;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 2.5em;
+    font-size: 1.5em;
+    color:#b7bbbe;
+    margin-right: 8%;
+}
+#num_sale>p{
+    float: left;
+    margin-top: 2%;
+    font-size: 3em;
+    margin-right: 8%;
+}
+.country_ele{
+    width:20%;
+    height:100%;
+    text-align: center;
+}
+.country_ele p:first-child{
+    width:68%;
+    height:30%;
+    border: 2px solid #cfd3d4;
+    margin-top:10%;
+    font-size:1em;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 2em;
+    color:#b7bbbe;
+    border-radius: 5px;
+}
+.country_ele p:last-child{
+    font-size:2em;
+}
+#main_top{
+    width:95%;
+    height:45%;
+    margin:0 auto;
+}
+#main_top div{
+    float: left;
+    width:25%;
+    height:100%;
+}
+#main_bottom{
+    width:95%;
+    height:40%;
+    margin:0 auto;
+}
+#main_bottom>div{
+    float: left;
+}
+#mytab{
+    width:27%;
+    height:100%;
+    float: left;
+}
+#mytab table{
+    width:90%;
+    height:80%;
+    text-align:center;
+    margin-top: 20px;
+    font-size: 1.5em;
+    font-weight: lighter;
+}
+#mytab table td{
+    color:#b7bbbe;
+    font-weight: lighter;
+}
+#shops{
+    width:50%;
+    height:100%;
+}
+#deal{
+    width:23%;
+    height:100%;
+}

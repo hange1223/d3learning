@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../js/d3.js" charset="UTF-8"></script>
+</head>
+<body>
+<script>
+    var _linescale = d3.scaleLinear()
+                        .domain([0,100]).nice()//nice用来优化数据  四舍五入等
+                        .range([0,300])//亦可以用rangeRound输出整数
+                        .clamp(false);
+    //获取定义域中某个数值对应的值域结果
+    console.log(_linescale(40));
+    console.log(_linescale(120));
+    //获取值域中对应的某个定义域的值
+    console.log(_linescale.invert(200));
+    console.log(_linescale.ticks(5));//.tickFormat设置格式如百分比等
+
+    let _datescale = d3.scaleTime()
+              .domain([new Date(2017, 0, 1), new Date(2017, 0, 2)])
+              .range([0,200])
+    console.log(_datescale(new Date(2017, 0, 1, 12)));
+    console.log(_datescale(new Date(2017, 0, 1, 15)));
+    console.log(_datescale(new Date(2017, 0, 1, 20)));
+    
+    console.log(_datescale(new Date(2017, 0, 2, 20)));
+</script>
+
+</body>
+</html>
