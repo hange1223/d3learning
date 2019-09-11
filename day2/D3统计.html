@@ -19,15 +19,25 @@
             return d*1.17;
         }
     }));
-    console.log(d3.sum(dataobj,function(d){
-        return d.value;
-    }));
+    // console.log(d3.sum(dataobj,function(d){
+    //     return d.value;
+    // }));
+    console.log(d3.min(dataset));
     console.log(d3.mean(dataset));
     console.log(d3.max(dataset));
     console.log(d3.extent(dataset));
     console.log(d3.max(dataobj,function(d){
         return d.value;
     }));
+    console.log(d3.median(dataset))
+    let newDataset = dataset.sort(function(a,b){
+        return a - b;
+    });
+    console.log('ssss',newDataset);
+    console.log(d3.quantile(newDataset, 0.25))
+    console.log(d3.quantile(newDataset, 0.5))
+    console.log(d3.variance(newDataset))
+    console.log(d3.deviation(newDataset))
 </script>
 </body>
 </html>
